@@ -40,3 +40,8 @@
 - `pwd` - показать текущую директорию
 
 **commit: `Урок 1: запускаем django сервер`**
+
+Создание приложения `python manage.py startapp news`
+После создания приложения, вам нужно зарегистрировать его в файле `settings.py` в разделе `INSTALLED_APPS`
+
+**commit: `Урок 1: cоздаём django_app news`**
