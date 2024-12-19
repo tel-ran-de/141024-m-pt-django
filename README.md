@@ -45,3 +45,23 @@
 После создания приложения, вам нужно зарегистрировать его в файле `settings.py` в разделе `INSTALLED_APPS`
 
 **commit: `Урок 1: cоздаём django_app news`**
+
+### Создали первое представление
+```python
+from django.http import HttpResponse
+
+def main(request):
+    return HttpResponse("Hello, world!")  # вернет страничку с надписью "Hello, world!"
+```
+Чтобы представление заработало, его нужно зарегистрировать в файле `urls.py` конфигурации проекта.
+
+### Создали первый URL
+```python
+from news import views
+
+path('', views.main),
+```
+
+Теперь, если вы перейдете на главную страницу сайта, то увидите надпись "Hello, world!"
+
+**commit: `Урок 1: создаём первый маршрут и первое представление`**
