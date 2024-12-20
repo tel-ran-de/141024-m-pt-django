@@ -1,11 +1,13 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from news import views
 
 
+# Подключаем файл urls.py из приложения news через include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main),
     path('info/', views.info),
+    path('news/', include('news.urls')),
 ]
