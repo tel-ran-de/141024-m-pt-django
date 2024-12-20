@@ -132,3 +132,14 @@ info = {
 - Переделали маршрут `info` в `about`
 
 **commit: `Урок 2: сделали ссылки в меню кликабельными`**
+
+- Описали маршруты 
+  `/catalog`,
+  `/catalog/<int:news_id/>`,
+  `/catalog/<slug:slug>`
+  и создали соответствующие представления в файле `views.py`
+- `catalog` возвращает `HttpResponse("Каталог новостей")`
+- `get_news_by_id` возвращает `HttpResponse(f"Новость {news_id}")`
+- `get_category_by_name` возвращает `HttpResponse(f"Карточка {slug}")`
+
+**commit: `Урок 2: добавили новые маршруты`**

@@ -27,6 +27,14 @@ def about(request):
     return HttpResponse('info')
 
 
+def catalog(request):
+    return HttpResponse('Каталог новостей')
+
+
+def get_category_by_name(request, slug):
+    return HttpResponse(f"Категория {slug}")
+
+
 def get_all_news(request):
     """
     Принимает информацию о проекте (словарь info)
