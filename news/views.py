@@ -4,8 +4,18 @@ from django.shortcuts import render
 
 info = {
     "users_count": 100600,
-    "news_count": 1000,
-    "menu": ["Главная", "О проекте", "Каталог"],
+    "news_count": 100600,
+    "menu": [
+        {"title": "Главная",
+         "url": "/",
+         "url_name": "index"},
+        {"title": "О проекте",
+         "url": "/about/",
+         "url_name": "about"},
+        {"title": "Каталог",
+         "url": "/news/catalog/",
+         "url_name": "catalog"},
+    ]
 }
 
 
