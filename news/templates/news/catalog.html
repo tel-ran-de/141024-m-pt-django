@@ -15,6 +15,9 @@
             <ul>
                 {% for item in menu %}
                     <li>{{ item }}</li>
+                    {% if not forloop.last %}
+                        <hr>
+                    {% endif %}
                 {% endfor %}
             </ul>
         </nav>
