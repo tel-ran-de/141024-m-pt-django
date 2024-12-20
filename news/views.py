@@ -31,6 +31,27 @@ def catalog(request):
     return HttpResponse('Каталог новостей')
 
 
+def get_categories(request):
+    """
+    Возвращает все категории для представления в каталоге
+    """
+    return HttpResponse('All categories')
+
+
+def get_news_by_category(request, slug):
+    """
+    Возвращает новости по категории для представления в каталоге
+    """
+    return HttpResponse(f'News by category {slug}')
+
+
+def get_news_by_tag(request, slug):
+    """
+    Возвращает новости по тегу для представления в каталоге
+    """
+    return HttpResponse(f'News by tag {slug}')
+
+
 def get_category_by_name(request, slug):
     return HttpResponse(f"Категория {slug}")
 
@@ -42,7 +63,8 @@ def get_all_news(request):
     return render(request, 'news/catalog.html', context=info)
 
 
-def get_news_by_id(request, news_id):
-    if news_id > 10:
-        return HttpResponse('Такой новости нет', status=404)
-    return HttpResponse(f'Вы открыли новость {news_id}')  # Вернёт страницу с надписью "Вы открыли новость {news_id}"
+def get_detail_news_by_id(request, news_id):
+    """
+    Возвращает детальную информацию по новости для представления
+    """
+    return HttpResponse(f'Detail news by id {news_id}')
