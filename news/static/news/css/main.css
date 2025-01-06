@@ -1,0 +1,4 @@
+/* добавим всем h1 зеленый фон */
+h1 {
+    background-color: green;
+}
