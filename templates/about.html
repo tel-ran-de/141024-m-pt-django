@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% comment %} template/about.html шаблон, расширяющий базовый шаблон base.html {% endcomment %}
+
+{% block title %}О сайте{% endblock %}
+
+{% block content %}
+    <h1>О сайте</h1>
+    <p>Добро пожаловать на наш сайт!</p>
+    <p>На нашем сайте, новостей {{ news_count }}, пользователей {{ users_count }}.</p>
+{% endblock %}
