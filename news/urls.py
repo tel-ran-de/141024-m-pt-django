@@ -6,6 +6,6 @@ from . import views
 urlpatterns = [
     path('', views.get_all_news),
     path('catalog/', views.catalog, name='catalog'),
-    path('catalog/<int:news_id>/', views.get_detail_news_by_id),
+    path('catalog/<int:article_id>/', views.get_detail_article_by_id, name='detail_article_by_id'),
     path('catalog/<slug:slug>/', views.get_category_by_name),
 ]

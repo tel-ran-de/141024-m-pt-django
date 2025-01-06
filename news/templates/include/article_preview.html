@@ -11,4 +11,17 @@
     favorites_count
 {% endcomment %}
 <!-- Краткое представление новости news/templates/include/article_preview.html -->
-<p> hello </p>
+<!-- Краткое представление новости news/templates/include/article_preview.html -->
+<div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">{{ article.title }}</h5>
+      <p class="card-text">{{ article.category }}</p>
+      <p class="card-text">{{ article.tags }}</p>
+      <p class="card-text">{{ article.id_author }}</p>
+      <p class="card-text">{{ article.id_card }}</p>
+      <p class="card-text">{{ article.upload_date }}</p>
+      <p class="card-text">{{ article.views_count }}</p>
+      <p class="card-text">{{ article.favorites_count }}</p>
+      <a href="{% url 'detail_article_by_id' article.id_article %}" class="btn btn-primary">Подробнее</a>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Детальное представление статьи news/templates/news/include/article_preview.html -->
+<div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">{{ article.title }}</h5>
+      <p class="card-text">{{ article.content }}</p>
+      <p class="card-text">{{ article.category }}</p>
+      <p class="card-text">{{ article.tags }}</p>
+      <p class="card-text">{{ article.id_author }}</p>
+      <p class="card-text">{{ article.id_card }}</p>
+      <p class="card-text">{{ article.upload_date }}</p>
+      <p class="card-text">{{ article.views_count }}</p>
+      <p class="card-text">{{ article.favorites_count }}</p>
+    </div>
+</div>
+{% endblock content %}
