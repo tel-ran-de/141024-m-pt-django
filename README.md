@@ -215,3 +215,10 @@ info = {
 
 **commit: `Урок 3: подключили статику в шаблоне base.html`**
 
+### Собственные шаблонные теги через `simple_tag`
+
+- Создали тег шаблона `upper_words` через `simple_tag` в файле `news/templatetags/upper_words.py`
+- Протестировали его в представлении `article_detail` в шаблоне `article_detail.html`
+- После создания тега и регистрации с помощью `template.Library()` нужно перезапустить сервер
+
+**commit: `Урок 3: создал собственный тег шаблона upper_words через simple_tag`**
