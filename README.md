@@ -247,3 +247,19 @@ info = {
 `admin`: Миграции для административного интерфейса `Django`.
 
 **commit: `Урок 4: применение инициализирующих миграций`**
+
+### Создаём первую модель данных
+1. Описание модели
+```python
+class Article(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    publication_date = models.DateTimeField(auto_now_add=True)
+    views = models.IntegerField(default=0)
+```
+2. Создание миграции
+`python manage.py makemigrations`
+3. Применение миграции
+`python manage.py migrate`
+
+**commit: `Урок 4: создание модели данных статьи и применение миграции`**
