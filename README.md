@@ -277,3 +277,39 @@ class Article(models.Model):
 `python manage.py loaddata articles.json`
 
 **commit: `Урок 4: Наполнили базу данных тестовыми данными`**
+
+### Операции CRUD в базе данных
+```python
+# Откройте Django Shell Plus
+python manage.py shell_plus
+
+# Импортируйте модель Article
+from news.models import Article
+
+# Создание новой статьи
+new_article = Article(
+    title="Вода стала розовой!",
+    content="Вчера вода во всех реках и озерах стала розовой. Ученые обещают найти причину этого явления.",
+    publication_date="2023-10-31T12:00:00Z",
+    views=0
+)
+new_article.save()
+
+# Чтение всех статей
+all_articles = Article.objects.all()
+for article in all_articles:
+    print(article.title, article.content, article.publication_date, article.views)
+    
+# Чтение одной статьи по её ID
+article = Article.objects.get(pk=1)
+print(article.title, article.content, article.publication_date, article.views)
+
+# Обновление статьи
+article.title = "Обновленная абсурдная новость"
+article.content = "Обновленное содержание абсурдной новости"
+article.save()
+
+# Удаление статьи
+article.delete()
+```
+**commit: `Урок 4: Посмотрели операции CRUD через командную строку`**
