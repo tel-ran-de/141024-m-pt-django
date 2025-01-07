@@ -263,3 +263,12 @@ class Article(models.Model):
 `python manage.py migrate`
 
 **commit: `Урок 4: создание модели данных статьи и применение миграции`**
+
+### Знакомство с `Shell Plus` и работа с моделью `Article` в интерактивной оболочке `Django`
+- Установили `Shell Plus` командой `pip install django-extensions`
+- Добавили `django_extensions` в `INSTALLED_APPS` в файле `settings.py` (перед нашим приложением `news`) 
+- Запустили `Shell Plus` командой `python manage.py shell_plus`
+(для отображения `SQL` запросов в консоли - `python manage.py shell_plus --print-sql`)
+(для выхода из консоли `Shell Plus` - `exit()`)
+
+**commit: `Урок 4: установка Shell Plus и подготовка ORM`**
