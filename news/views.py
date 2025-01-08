@@ -1,5 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from .models import Article
 
 
 """
@@ -181,25 +182,33 @@ def get_category_by_name(request, slug):
 
 
 def get_all_news(request):
-    """
-    Принимает информацию о проекте (словарь info)
-    """
-    return render(request, 'news/catalog.html', context=info)
+
+    articles = Article.objects.all()
+
+    context = {
+        'news': articles,
+        'menu': [
+            {"title": "Главная", "url": "/", "url_name": "index"},
+            {"title": "О проекте", "url": "/about/", "url_name": "about"},
+            {"title": "Каталог", "url": "/news/catalog/", "url_name": "catalog"},
+        ],
+    }
+
+    return render(request, 'news/catalog.html', context=context)
 
 
 def get_detail_article_by_id(request, article_id):
     """
     Возвращает детальную информацию по новости для представления
     """
-    article = None
+    article = get_object_or_404(Article, pk=article_id)
 
-    for a in news_dataset:
-        if a['id_article'] == article_id:
-            article = a
-            break
-    info['article'] = article
-
-    if article:
-        return render(request, 'news/article_detail.html', context=info)
-
-    return HttpResponse('Статья не найдена', status=404)
+    context = {
+        'article': article,
+        'menu': [
+            {"title": "Главная", "url": "/", "url_name": "index"},
+            {"title": "О проекте", "url": "/about/", "url_name": "about"},
+            {"title": "Каталог", "url": "/news/catalog/", "url_name": "catalog"},
+        ],
+    }
+    return render(request, 'news/article_detail.html', context=context)
