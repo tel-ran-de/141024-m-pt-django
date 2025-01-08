@@ -313,3 +313,22 @@ article.save()
 article.delete()
 ```
 **commit: `Урок 4: Посмотрели операции CRUD через командную строку`**
+
+
+## Урок 5
+
+### Расширили модель данных тегами и категориями через связи `ForeignKey` и `ManyToManyField`
+```python
+class Article(models.Model):
+    ...
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, default=1)
+    tags = models.ManyToManyField('Tag', related_name='article')
+class Category(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+class Tag(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+```
+### Создали миграции с помощью команды `python manage.py makemigrations`
+### Применили миграции с помощью команды `python manage.py migrate`
+
+**commit: `Урок 5: Добавили модели данных Category и Tag`**
