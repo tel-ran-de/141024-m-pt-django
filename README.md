@@ -332,3 +332,7 @@ class Tag(models.Model):
 ### Применили миграции с помощью команды `python manage.py migrate`
 
 **commit: `Урок 5: Добавили модели данных Category и Tag`**
+
+Загрузили новые данные соответствующие новым моделям с помощью команды `python manage.py loaddata articles_2.json`
+
+**commit: `Урок 5: Загрузка новых данных`**
