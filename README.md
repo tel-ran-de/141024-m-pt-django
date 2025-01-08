@@ -336,3 +336,86 @@ class Tag(models.Model):
 Загрузили новые данные соответствующие новым моделям с помощью команды `python manage.py loaddata articles_2.json`
 
 **commit: `Урок 5: Загрузка новых данных`**
+
+### Рассмотрели примеры в `Django ORM`
+```python
+# Откройте Django Shell
+# python manage.py  shell_plus
+
+# Создайте новый тег
+new_tag = Tag(name="Новый тег")
+new_tag.save()
+
+# Создайте новую категорию
+new_category = Category(name="Новая категория")
+new_category.save()
+
+# Создайте новую статью с этим тегом и категорией
+new_article = Article(
+    title="Новая абсурдная новость",
+    content="Содержание новой абсурдной новости",
+    category=new_category
+)
+new_article.save()
+new_article.tags.add(new_tag)
+
+# Чтение всех категорий
+all_categories = Category.objects.all()
+for category in all_categories:
+    print(category.name)
+    
+# Чтение всех тегов
+all_tags = Tag.objects.all()
+for tag in all_tags:
+    print(tag.name)
+    
+# Чтение всех статей
+all_articles = Article.objects.all()
+for article in all_articles:
+    print(article.title, article.content, article.category.name, [tag.name for tag in article.tags.all()])
+
+# Чтение одной категории по её ID
+category = Category.objects.get(pk=1)
+print(category.name)
+
+# Чтение одного тега по его ID
+tag = Tag.objects.get(pk=1)
+print(tag.name)
+
+# Чтение одной статьи по её ID
+article = Article.objects.get(pk=1)
+print(article.title, article.content, article.category.name, [tag.name for tag in article.tags.all()])
+
+# Обновите тег
+tag = Tag.objects.get(name="Новый тег")
+tag.name = "Обновленный тег"
+tag.save()
+
+# Обновите категорию
+category = Category.objects.get(name="Новая категория")
+category.name = "Обновленная категория"
+category.save()
+
+# Обновите статью
+article = Article.objects.get(title="Новая абсурдная новость")
+article.title = "Обновленная абсурдная новость"
+article.content = "Обновленное содержание абсурдной новости"
+article.save()
+
+# Обновите теги статьи
+new_tag = Tag.objects.get(name="Обновленный тег")
+article.tags.add(new_tag)
+
+# Удаление категории
+category = Category.objects.get(name="Обновленная категория")
+category.delete()
+
+# Удаление тега
+tag = Tag.objects.get(name="Обновленный тег")
+tag.delete()
+
+# Удаление статьи
+article = Article.objects.get(title="Обновленная абсурдная новость")
+article.delete()
+```
+**commit: `Урок 5: Посмотрели операции CRUD через командную строку`**
