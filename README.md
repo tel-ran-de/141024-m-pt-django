@@ -456,3 +456,38 @@ def get_detail_article_by_id(request, article_id):
 ```
 
 **commit: `Урок 5: Подключили модели данных к представлениям`**
+
+### Сделали ORM запросы на выборку по тегам и категориям
+
+#### Выборка статей по категории
+```python
+# Пример: Получение всех статей в категории "Технологии"
+category_name = "Технологии"
+category = Category.objects.get(name=category_name)
+articles_in_category = Article.objects.filter(category=category)
+for article in articles_in_category:
+    print(article.title)
+```
+
+#### Выборка статей по тегу
+```python
+# Пример: Получение всех статей с тегом "Инновации"
+tag_name = "Инновации"
+tag = Tag.objects.get(name=tag_name)
+articles_with_tag = Article.objects.filter(tags=tag)
+for article in articles_with_tag:
+    print(article.title)
+```
+
+#### Выборка статей по категории и тегу
+```python
+# Пример: Получение всех статей в категории "Наука" и с тегом "Исследования"
+category_name = "Наука"
+tag_name = "Исследования"
+category = Category.objects.get(name=category_name)
+tag = Tag.objects.get(name=tag_name)
+articles_in_category_and_tag = Article.objects.filter(category=category, tags=tag)
+for article in articles_in_category_and_tag:
+    print(article.title)
+```
+**commit: `Урок 5: Посмотрели операции на выборку новостей по тегу и/или категории`**
