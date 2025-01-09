@@ -781,3 +781,65 @@ for i in published_articles:
 ```
 
 **commit: `Урок 6: Добавление пользовательского менеджера модели Article`**
+
+### Исправление `slug` в модели данных `Article`
+`unidecode` — это библиотека `Python`, которая преобразует `Unicode`-строки в ближайшие эквиваленты `ASCII`.
+Это полезно, когда вам нужно удалить или заменить не-`ASCII` символы в строке,
+чтобы сделать её более совместимой с системами, которые не поддерживают `Unicode`.
+
+#### Установка `unidecode`
+`pip install unidecode`
+
+#### Применение `unidecode` к `slug` в модели данных `Article`
+```python
+from django.utils.text import slugify
+from unidecode import unidecode
+
+
+class Article(models.Model):
+    ...
+    slug = models.SlugField(unique=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+        # Сохраняем статью, чтобы получить id
+        super().save(*args, **kwargs)
+
+        if not self.slug:
+            base_slug = slugify(unidecode.unidecode(self.title))
+            self.slug = f"{base_slug}-{self.id}"
+
+        # Сохраняем статью снова, чтобы обновить слаг
+        super().save(*args, **kwargs)
+```
+
+#### Проверка работы slugify и unidecode
+```python
+# Создаем категорию, если она еще не существует
+category, created = Category.objects.get_or_create(name="Технологии")
+
+# Создаем теги, если они еще не существуют
+tag1, created = Tag.objects.get_or_create(name="Технологии")
+tag2, created = Tag.objects.get_or_create(name="Инновации")
+
+# Создаем статью
+article = Article(
+    title="Новая статья о технологиях",
+    content="Это тестовая статья для проверки работы поля slug.",
+    category=category,
+)
+
+# Сохраняем статью, чтобы убедиться, что slug был сгенерирован
+article.save()
+
+# Добавляем теги к статье
+article.tags.add(tag1, tag2)
+
+# Выводим информацию о статье, чтобы убедиться, что slug был сгенерирован
+print(f"Title: {article.title}")
+print(f"Slug: {article.slug}")
+print(f"Content: {article.content}")
+print(f"Category: {article.category.name}")
+print(f"Tags: {', '.join([tag.name for tag in article.tags.all()])}")
+```
+
+**commit: `Урок 6: Исправили `slug`**
