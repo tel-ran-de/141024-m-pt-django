@@ -728,3 +728,21 @@ class Article(models.Model):
 `python manage.py loaddata articles_3.json`
 
 **commit: `Урок 6: Добавили slug в Article`**
+
+### Добавление слага в маршруты и представления
+```python
+# news/urls.py
+urlpatterns = [
+    ...
+    path('catalog/<slug:slug>/', views.get_detail_article_by_slag, name='detail_article_by_slag'),
+]
+```
+```python
+# news/views.py
+def get_detail_article_by_slag(request, slug):
+    article = get_object_or_404(Article, slug=slug)
+    ...
+    return render(request, 'news/article_detail.html', context=context)
+```
+
+**commit: `Урок 6: Добавление slug в маршруты и представления`**

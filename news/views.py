@@ -212,3 +212,17 @@ def get_detail_article_by_id(request, article_id):
         ],
     }
     return render(request, 'news/article_detail.html', context=context)
+
+
+def get_detail_article_by_title(request, title):
+
+    article = get_object_or_404(Article, slug=title)
+    context = {
+        'article': article,
+        'menu': [
+            {"title": "Главная", "url": "/", "url_name": "index"},
+            {"title": "О проекте", "url": "/about/", "url_name": "about"},
+            {"title": "Каталог", "url": "/news/catalog/", "url_name": "catalog"},
+        ],
+    }
+    return render(request, 'news/article_detail.html', context=context)
