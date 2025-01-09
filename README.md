@@ -699,3 +699,32 @@ for article in articles_with_open_in_title:
 2. Выводим заголовки всех статей, которые соответствуют этому условию.
 
 **commit: `Урок 6: Разобрали первое практическое задание`**
+
+### Новое поле `slug` в модели данных `Article`
+
+#### Сначала нужно очистить БД
+`python manage.py flush`
+
+#### Добавляем `slug` и переопределяем метод сохранения
+```python
+from django.utils.text import slugify
+class Article(models.Model):
+    ...
+    slug = models.SlugField(unique=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+```
+
+#### Создаём миграцию
+`python manage.py makemigrations`
+
+#### Применяем миграцию
+`python manage.py migrate`
+
+#### Загружаем новый дамп данных
+`python manage.py loaddata articles_3.json`
+
+**commit: `Урок 6: Добавили slug в Article`**
