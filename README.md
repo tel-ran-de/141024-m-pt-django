@@ -746,3 +746,38 @@ def get_detail_article_by_slag(request, slug):
 ```
 
 **commit: `Урок 6: Добавление slug в маршруты и представления`**
+
+### Добавление пользовательского менеджера модели
+
+#### Создание пользовательского менеджера
+
+```python
+class ArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+    def sorted_by_title(self):
+        return self.get_queryset().all().order_by('-title')
+```
+
+#### Добавление пользовательского менеджера в модель
+```python
+class Article(models.Model):
+    ...
+    is_active = models.BooleanField(default=True)
+    objects = ArticleManager()
+```
+
+#### Создание миграции
+`python manage.py makemigrations`
+
+#### Применение миграции
+`python manage.py migrate`
+
+#### Проверка пользовательского менеджера модели в shell_plus
+```python
+published_articles = Article.objects.sorted_by_title()
+for i in published_articles:
+    print(i.title)
+```
+
+**commit: `Урок 6: Добавление пользовательского менеджера модели Article`**
