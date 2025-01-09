@@ -491,3 +491,54 @@ for article in articles_in_category_and_tag:
     print(article.title)
 ```
 **commit: `Урок 5: Посмотрели операции на выборку новостей по тегу и/или категории`**
+
+
+## Урок 6
+
+### Задача: Получить все статьи, которые принадлежат категории "Технологии".
+
+```python
+# Получаем объект категории "Технологии"
+technology_category = Category.objects.get(name="Технологии")
+# Фильтруем статьи по этой категории
+articles_in_technology = Article.objects.filter(category=technology_category)
+# Выводим результат
+for article in articles_in_technology:
+    print(article.title)
+```
+
+### Задача: Получить все статьи, которые имеют тег "Инновации".
+```python
+# Получаем объект тега "Инновации"
+innovation_tag = Tag.objects.get(name="Инновации")
+# Фильтруем статьи по этому тегу
+articles_with_innovation_tag = Article.objects.filter(tags=innovation_tag)
+# Выводим результат
+for article in articles_with_innovation_tag:
+    print(article.title)
+```
+
+### Задача: Получить все статьи, отсортированные по заголовку в порядке убывания
+```python
+# Сортируем статьи по заголовку в порядке убывания
+articles_sorted_by_title = Article.objects.all().order_by('-title')
+# Выводим результат
+for article in articles_sorted_by_title:
+    print(article.title, article.id)
+```
+
+### Задача: Получить все статьи, у которых количество просмотров больше 10, отсортированные по количеству просмотров в порядке возрастания.
+Для начала можно изменить у некоторых статей количество просмотров, чтобы выборка имела смысл
+```python
+# Фильтруем статьи, у которых id больше 30, и обновляем их количество просмотров
+Article.objects.filter(id__gt=30).update(views=20)
+```
+```python
+# Фильтруем статьи по количеству просмотров и сортируем их
+articles_filtered_and_sorted = Article.objects.filter(views__gt=10).order_by('views')
+# Выводим результат
+for article in articles_filtered_and_sorted:
+    print(article.title, article.views)
+```
+
+**commit: `Урок 6: Рассмотрели операции на фильтрацию и сортировку данных, а так же лукапы`**
