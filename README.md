@@ -887,4 +887,36 @@ tag_q2 = Q(tags__name='Исследования')
 # Комбинируем условия с помощью логических операторов
 articles = Article.objects.filter((category_q1 | category_q2) & (tag_q1 | tag_q2))
 ```
+
 **commit: `Урок 7: Класс Q`**
+
+### Методы exists() и count(): Проверка наличия данных и подсчёт записей
+```python
+# Пример 1: Проверка наличия статей в категории "Технологии"
+# Проверяем наличие статей в категории "Технологии"
+exists = Article.objects.filter(category__name='Технологии').exists()
+print(exists)  # Выведет True или False
+
+# Пример 2: Подсчет количества статей в категории "Наука"
+# Подсчитываем количество статей в категории "Наука"
+count = Article.objects.filter(category__name='Наука').count()
+print(count)  # Выведет количество статей
+
+# Пример 3: Проверка наличия статей с тегом "Инновации" или "Исследования"
+# Создаем объекты Q для условий
+tag_q1 = Q(tags__name='Инновации')
+tag_q2 = Q(tags__name='Исследования')
+# Проверяем наличие статей с тегами "Инновации" или "Исследования"
+exists = Article.objects.filter(tag_q1 | tag_q2).exists()
+print(exists)  # Выведет True или False
+
+# Пример 4: Подсчет количества статей в категории "Технологии" или "Наука"
+# Создаем объекты Q для условий
+category_q1 = Q(category__name='Технологии')
+category_q2 = Q(category__name='Наука')
+# Подсчитываем количество статей в категории "Технологии" или "Наука"
+count = Article.objects.filter(category_q1 | category_q2).count()
+print(count)  # Выведет количество статей
+```
+
+**commit: `Урок 7: Методы exists() и count()`**
