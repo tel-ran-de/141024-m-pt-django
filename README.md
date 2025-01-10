@@ -940,3 +940,37 @@ for article in articles:
     print(article.increased_views)  # Выведет количество просмотров, увеличенное на 10
 ```
 **commit: `Урок 7: Класс F, Value и метод annotate()`**
+
+### Агрегация данных: Использование Count, Sum, Avg, Max, Min и метода values()
+```python
+# Пример 1: Подсчет количества статей в каждой категории
+# Подсчитываем количество статей в каждой категории
+category_counts = Article.objects.values('category__name').annotate(count=Count('id'))
+for category in category_counts:
+    print(f"Category: {category.name}, Count: {category.count}")
+
+# Пример 2: Суммирование количества просмотров всех статей
+# Подсчитываем суммарное количество просмотров всех статей
+total_views = Article.objects.aggregate(total_views=Sum('views'))
+print(f"Total Views: {total_views['total_views']}")
+
+# Пример 3: Вычисление среднего количества просмотров статей
+# Вычисляем среднее количество просмотров статей
+average_views = Article.objects.aggregate(average_views=Avg('views'))
+print(f"Average Views: {average_views['average_views']}")
+
+# Пример 4: Нахождение максимального и минимального количества просмотров статей
+# Находим максимальное и минимальное количество просмотров статей
+max_views = Article.objects.aggregate(max_views=Max('views'))
+min_views = Article.objects.aggregate(min_views=Min('views'))
+print(f"Max Views: {max_views['max_views']}")
+print(f"Min Views: {min_views['min_views']}")
+
+# Пример 5: Подсчет количества статей в каждой категории с использованием values() и annotate()
+# Подсчитываем количество статей в каждой категории
+category_counts = Article.objects.values('category__name').annotate(count=Count('id'))
+for category in category_counts:
+    print(f"Category: {category['category__name']}, Count: {category['count']}")
+```
+
+**commit: `Урок 7: Агрегация данных`**
