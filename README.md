@@ -854,3 +854,37 @@ print(f"Tags: {', '.join([tag.name for tag in article.tags.all()])}")
 `python manage.py loaddata articles_4.json`
 
 **commit: `Урок 7: Подготовка данных`**
+
+### Класс Q
+```python
+# Пример 1: Простое использование Q
+# Создаем объекты Q для условий
+category_q = Q(category__name='Технологии')
+tag_q = Q(tags__name='Инновации')
+# Комбинируем условия с помощью логического оператора OR
+articles = Article.objects.filter(category_q | tag_q)
+
+# Пример 2: Комбинирование условий с AND и OR
+# Создаем объекты Q для условий
+category_q = Q(category__name='Наука')
+tag_q1 = Q(tags__name='Исследования')
+tag_q2 = Q(tags__name='Инновации')
+# Комбинируем условия с помощью логических операторов
+articles = Article.objects.filter(category_q & (tag_q1 | tag_q2))
+
+# Пример 3: Использование NOT
+# Создаем объект Q для условия
+category_q = Q(category__name='Спорт')
+# Используем логический оператор NOT
+articles = Article.objects.filter(~category_q)
+
+# Пример 4: Комбинирование нескольких условий
+# Создаем объекты Q для условий
+category_q1 = Q(category__name='Технологии')
+category_q2 = Q(category__name='Наука')
+tag_q1 = Q(tags__name='Инновации')
+tag_q2 = Q(tags__name='Исследования')
+# Комбинируем условия с помощью логических операторов
+articles = Article.objects.filter((category_q1 | category_q2) & (tag_q1 | tag_q2))
+```
+**commit: `Урок 7: Класс Q`**
