@@ -843,3 +843,14 @@ print(f"Tags: {', '.join([tag.name for tag in article.tags.all()])}")
 ```
 
 **commit: `Урок 6: Исправили `slug`**
+
+
+## Урок 7
+
+### Очистка базы данных
+`python manage.py flush`
+
+### Загрузка новых данных
+`python manage.py loaddata articles_4.json`
+
+**commit: `Урок 7: Подготовка данных`**
