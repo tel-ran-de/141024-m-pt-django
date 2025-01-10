@@ -920,3 +920,23 @@ print(count)  # Выведет количество статей
 ```
 
 **commit: `Урок 7: Методы exists() и count()`**
+
+### Класс F, Value и метод annotate(): Выполнение операций с полями внутри запросов
+```python
+# Пример 1: Увеличение количества просмотров статьи
+# Найдем статью по slug и увеличим количество просмотров на 1
+Article.objects.filter(slug='17-kroty-otkryli-restoran').update(views=F('views') + 1)
+
+# Пример 2: Аннотация статей с константным значением
+# Аннотируем все статьи с константным значением is_featured
+articles = Article.objects.annotate(is_featured=Value(True))
+for article in articles:
+    print(article.is_featured)  # Выведет True для всех статей
+    
+# Пример 3: Аннотация статей с количеством просмотров, увеличенным на 10
+# Аннотируем все статьи с количеством просмотров, увеличенным на 10
+articles = Article.objects.annotate(increased_views=F('views') + 10)
+for article in articles:
+    print(article.increased_views)  # Выведет количество просмотров, увеличенное на 10
+```
+**commit: `Урок 7: Класс F, Value и метод annotate()`**
