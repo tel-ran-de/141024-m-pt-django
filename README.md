@@ -974,3 +974,85 @@ for category in category_counts:
 ```
 
 **commit: `Урок 7: Агрегация данных`**
+
+### Практика
+
+```python
+from django.utils import timezone
+# Задача 1: Найти все статьи, которые были опубликованы после 31 октября 2023 года.
+# Фильтрация статей по дате публикации, которая больше 31 октября 2023 года.
+articles = Article.objects.filter(publication_date__gt=timezone.datetime(2023, 10, 31))
+print(articles)
+
+# Задача 2: Найти все статьи, которые принадлежат категории "Образование" и имеют тег "Инновации".
+# Создание объектов Q для условий фильтрации для категории "Образование" и тега "Инновации".
+category_q = Q(category__name='Образование')
+tag_q = Q(tags__name='Инновации')
+# Комбинирование условий с использованием логического оператора AND.
+articles = Article.objects.filter(category_q & tag_q)
+print(articles)
+
+# Задача 3: Найти все статьи, которые не принадлежат категории "Культура".
+# Создание объекта Q для условия фильтрации для категории "Культура".
+category_q = Q(category__name='Культура')
+# Использование логического оператора NOT для инвертирования условия.
+articles = Article.objects.filter(~category_q)
+print(articles)
+
+# Задача 4: Найти все статьи, которые принадлежат категории "Здоровье" или "Образование" и имеют тег "Исследования".
+# Создание объектов Q для условий фильтрации для категорий "Здоровье" и "Образование" и тега "Исследования".
+category_q1 = Q(category__name='Здоровье')
+category_q2 = Q(category__name='Образование')
+tag_q = Q(tags__name='Исследования')
+# Комбинирование условий с использованием логических операторов OR и AND.
+articles = Article.objects.filter((category_q1 | category_q2) & tag_q)
+print(articles)
+
+# Задача 5: Увеличить количество просмотров всех статей на 5.
+# Использование класса F для создания выражения, которое ссылается на поле views.
+# Обновление всех записей в таблице Article, увеличивая количество просмотров на 5.
+Article.objects.update(views=F('views') + 5)
+
+# Задача 6: Аннотировать все статьи с константным значением `is_featured` равным `False`.
+# Использование метода annotate() для добавления нового поля is_featured со значением False ко всем статьям.
+articles = Article.objects.annotate(is_featured=Value(False))
+for article in articles:
+    print(article.is_featured)  # Выведет False для всех статей
+    
+# Задача 7: Найти все статьи, которые были опубликованы в 2023 году.
+# Фильтрация статей по году публикации, который равен 2023.
+articles = Article.objects.filter(publication_date__year=2023)
+print(articles)
+
+# Задача 8: Найти все статьи, которые принадлежат категории "Технологии" и имеют тег "Инновации".
+# Создание объектов Q для условий фильтрации для категории "Технологии" и тега "Инновации".
+category_q = Q(category__name='Технологии')
+tag_q = Q(tags__name='Инновации')
+# Комбинирование условий с использованием логического оператора AND.
+articles = Article.objects.filter(category_q & tag_q)
+print(articles)
+
+# Задача 9: Подсчитать количество статей в каждой категории.
+# Использование метода values() для выбора поля category__name, по которому будем группировать данные.
+# Использование метода annotate() для добавления нового поля count, которое представляет собой количество статей в каждой категории.
+category_counts = Article.objects.values('category__name').annotate(count=Count('id'))
+for category in category_counts:
+    print(f"Category: {category['category__name']}, Count: {category['count']}")
+
+# Задача 10: Подсчитать суммарное количество просмотров всех статей.
+# Использование метода aggregate() для выполнения агрегатной операции суммирования над полем views.
+total_views = Article.objects.aggregate(total_views=Sum('views'))
+print(f"Total Views: {total_views['total_views']}")
+
+# Задача 11: Найти статьи, у которых количество просмотров больше 150.
+# Фильтрация статей по количеству просмотров, которое больше 150.
+articles = Article.objects.filter(views__gt=150)
+print(articles)
+
+# Задача 12: Найти статьи, у которых количество просмотров меньше или равно 200.
+# Фильтрация статей по количеству просмотров, которое меньше или равно 200.
+articles = Article.objects.filter(views__lte=200)
+print(articles)
+```
+
+**commit: `Урок 7: Практика`**
