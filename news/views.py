@@ -183,10 +183,11 @@ def get_category_by_name(request, slug):
 
 def get_all_news(request):
 
-    articles = Article.objects.all()
+    articles = Article.objects.select_related('category').prefetch_related('tags')
 
     context = {
         'news': articles,
+        'news_count': len(articles),
         'menu': [
             {"title": "Главная", "url": "/", "url_name": "index"},
             {"title": "О проекте", "url": "/about/", "url_name": "about"},
