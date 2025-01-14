@@ -1643,3 +1643,194 @@ Model.objects.filter(condition).delete()
      ```
      
 **commit: `Урок 9: те же запросы, но в Django ORM`**
+
+### Запросы на языке SQL
+
+#### 1. Создание новой категории
+**Пример:**
+Создайте новую категорию с именем "Путешествия".
+```sql
+INSERT INTO news_category (name) VALUES ('Путешествия');
+```
+
+#### 2. Создание новой статьи
+**Пример:**
+Создайте новую статью с заголовком "Путешествие в Исландию", содержанием "Исландия — удивительная страна с вулканами и гейзерами.", датой публикации "2023-10-15T12:00:00Z", количеством просмотров 100, категорией "Путешествия" и активным статусом.
+```sql
+INSERT INTO news_article (title, content, publication_date, views, category_id, slug, is_active)
+VALUES (
+    'Путешествие в Исландию',
+    'Исландия — удивительная страна с вулканами и гейзерами.',
+    '2023-10-15T12:00:00Z',
+    100,
+    (SELECT id FROM news_category WHERE name = 'Путешествия'),
+    'puteshestvie-v-islandiyu',
+    TRUE
+);
+```
+
+#### 3. Выборка всех статей из категории "Технологии"
+**Пример:**
+Выберите все статьи из категории "Технологии".
+```sql
+SELECT * FROM news_article
+WHERE category_id = (SELECT id FROM news_category WHERE name = 'Технологии');
+```
+
+#### 4. Выборка всех активных статей
+```sql
+SELECT * FROM news_article WHERE is_active = TRUE;
+```
+
+#### 5. Обновление заголовка статьи
+**Пример:**
+Обновите заголовок статьи с `id` 1 на "Новый заголовок".
+```sql
+UPDATE news_article SET title = 'Новый заголовок' WHERE id = 1;
+```
+
+#### 6. Увеличение количества просмотров статьи
+**Пример:**
+Увеличьте количество просмотров статьи с `id` 2 на 50.
+```sql
+UPDATE news_article SET views = views + 50 WHERE id = 2;
+```
+
+#### 7. Удаление статьи
+**Пример:**
+Удалите статью с `id` 73.
+```sql
+DELETE FROM news_article_tags WHERE article_id = 73;
+DELETE FROM news_article WHERE id = 73;
+```
+
+#### 8. Создание нового тега
+**Пример:**
+Создайте новый тег с именем "Путешествия".
+```sql
+INSERT INTO news_tag (name) VALUES ('Путешествия');
+```
+
+#### 9. Добавление тега к статье
+**Пример:**
+Добавьте тег "Путешествия" к статье с `id` 21.
+```sql
+INSERT INTO news_article_tags (article_id, tag_id)
+VALUES (21, (SELECT id FROM news_tag WHERE name = 'Путешествия'));
+```
+
+#### 10. Выборка всех статей с определенным тегом
+**Пример:**
+Выберите все статьи, которые имеют тег "Путешествия".
+```sql
+SELECT * FROM news_article
+WHERE id IN (
+    SELECT article_id FROM news_article_tags
+    WHERE tag_id = (SELECT id FROM news_tag WHERE name = 'Путешествия')
+);
+```
+
+#### 11. Удаление тега из статьи
+**Пример:**
+Удалите тег "Путешествия" из статьи с `id` 21.
+```sql
+DELETE FROM news_article_tags
+WHERE article_id = 21 AND tag_id = (SELECT id FROM news_tag WHERE name = 'Путешествия');
+```
+
+### Запросы на языке Django ORM
+
+#### 12. Создание новой категории
+**Пример:**
+Создайте новую категорию с именем "Путешествия".
+```python
+Category.objects.create(name='Путешествия')
+```
+
+#### 13. Создание новой статьи
+**Пример:**
+Создайте новую статью с заголовком "Путешествие в Исландию", содержанием "Исландия — удивительная страна с вулканами и гейзерами.", датой публикации "2023-10-15T12:00:00Z", количеством просмотров 100, категорией "Путешествия" и активным статусом.
+```python
+category = Category.objects.get(name='Путешествия')
+Article.objects.create(
+    title='Путешествие в Исландию',
+    content='Исландия — удивительная страна с вулканами и гейзерами.',
+    publication_date='2023-10-15T12:00:00Z',
+    views=100,
+    category=category,
+    slug='puteshestvie-v-islandiyu',
+    is_active=True
+)
+```
+
+#### 14. Выборка всех статей из категории "Технологии"
+**Пример:**
+Выберите все статьи из категории "Технологии".
+```python
+category = Category.objects.get(name='Технологии')
+articles = Article.objects.filter(category=category)
+```
+
+#### 15. Выборка всех активных статей
+```python
+active_articles = Article.objects.filter(is_active=True)
+```
+
+#### 16. Обновление заголовка статьи
+**Пример:**
+Обновите заголовок статьи с `id` 1 на "Новый заголовок".
+```python
+Article.objects.filter(id=1).update(title='Новый заголовок')
+```
+
+#### 17. Увеличение количества просмотров статьи
+**Пример:**
+Увеличьте количество просмотров статьи с `id` 2 на 50.
+```python
+Article.objects.filter(id=2).update(views=F('views') + 50)
+```
+
+#### 18. Удаление статьи
+**Пример:**
+Удалите статью с `id` 73.
+```python
+article = Article.objects.get(id=73)
+article.tags.clear()  # Удаление всех связанных тегов
+article.delete()  # Удаление статьи
+```
+
+#### 19. Создание нового тега
+**Пример:**
+Создайте новый тег с именем "Путешествия".
+
+```python
+Tag.objects.create(name='Путешествия')
+```
+
+#### 20. Добавление тега к статье
+**Пример:**
+Добавьте тег "Путешествия" к статье с `id` 21.
+```python
+article = Article.objects.get(id=21)
+tag = Tag.objects.get(name='Путешествия')
+article.tags.add(tag)
+```
+
+#### 21. Выборка всех статей с определенным тегом
+**Пример:**
+Выберите все статьи, которые имеют тег "Путешествия".
+```python
+tag = Tag.objects.get(name='Путешествия')
+articles = Article.objects.filter(tags=tag)
+```
+
+#### 22. Удаление тега из статьи
+**Пример:**
+Удалите тег "Путешествия" из статьи с `id` 21.
+```python
+article = Article.objects.get(id=21)
+tag = Tag.objects.get(name='Путешествия')
+article.tags.remove(tag)
+```
+
+**commit: `Урок 9: решение практики`**
