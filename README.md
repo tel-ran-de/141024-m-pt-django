@@ -1347,3 +1347,77 @@ pip install ipython
 ```
 
 **commit: `Урок 9: установка ipython`**
+
+### Если у вас установлен `pgAdmin` и вы хотите перенести базу данных из `SQLite` в `PostgreSQL`, выполните следующие шаги:
+
+#### Шаг 1: Установите необходимые библиотеки
+1. **Установите библиотеку `psycopg2` для Django**:
+   ```sh
+   pip install psycopg2-binary
+   ```
+
+#### Шаг 2: Настройте `PostgreSQL` через `pgAdmin`
+1. **Откройте `pgAdmin` и подключитесь к вашему серверу `PostgreSQL`**.
+2. **Создайте новую базу данных**:
+   - В `pgAdmin`, щелкните правой кнопкой мыши на "Databases" и выберите "Create" > "Database".
+   - Введите имя базы данных (например, `itg`) и выберите владельца (например, `postgres`).
+   - Нажмите "Save".
+   - 
+#### Шаг 3: Экспортируйте данные из `SQLite`
+1. **Создайте дамп данных из `SQLite`**:
+```sh
+python manage.py dumpdata --format=json --indent=4 > db.json
+```
+
+#### Шаг 4: Настройте `Django` для использования `PostgreSQL`
+1. **Обновите `settings.py`**:
+   ```python
+   DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'itg_141024',
+           'USER': 'postgres',
+           'PASSWORD': 'admin',
+           'HOST': 'localhost',
+           'PORT': '5432',
+       }
+   }
+   ```
+
+#### Шаг 5: Примените миграции в `PostgreSQL`
+1. **Создайте миграции (если их нет)**:
+   ```sh
+   python manage.py makemigrations
+   ```
+2. **Примените миграции**:
+   ```sh
+   python manage.py migrate
+   ```
+
+#### Шаг 6: Импортируйте данные в PostgreSQL
+1. **Загрузите данные из JSON файла**:
+```sh
+python manage.py loaddata db.json
+```
+или из articles_4.json
+```sh
+python manage.py loaddata articles_4.json
+```
+
+#### Шаг 7: Проверьте данные
+1. **Запустите сервер разработки и убедитесь, что все работает**:
+```sh
+python manage.py runserver
+```
+
+#### Шаг 8: Очистите старую базу данных SQLite (опционально)
+1. **Удалите файл SQLite базы данных**:
+```sh
+del db.sqlite3
+```
+
+#### Примечания
+- **Проверка данных**: Убедитесь, что все данные успешно перенесены и что приложение работает корректно с новой базой данных `PostgreSQL`.
+- **Обработка ошибок**: Если возникнут ошибки при импорте данных, проверьте логи и исправьте проблемы в данных или в моделях `Django`.
+
+**commit: `Урок 9: перенесли данные из SQLite в PostgreSQL`**
