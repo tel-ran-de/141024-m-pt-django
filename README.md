@@ -1526,3 +1526,120 @@ WHERE condition;
      ```
 
 **commit: `Урок 9: посмотрели операции CRUD для SQL`**
+
+### Синтаксические конструкции для CRUD-запросов: Основы написания команд INSERT, SELECT, UPDATE, DELETE с использованием Django ORM
+`CRUD` (`Create`, `Read`, `Update`, `Delete`) — это основные операции, которые выполняются с базой данных. В `Django ORM` эти операции соответствуют методам `create()`, `filter()`, `update()` и `delete()`. Рассмотрим синтаксис каждого из этих методов и приведем по два примера для каждой операции.
+
+#### 1. Метод `create()`
+Метод `create()` используется для добавления новых записей в таблицу.
+**Синтаксис:**
+```python
+Model.objects.create(field1=value1, field2=value2, ...)
+```
+
+**Примеры:**
+1. Добавление новой категории:
+   ```python
+   from news.models import Category
+   new_category = Category.objects.create(name='Новая категория')
+   ```
+
+2. Добавление трех новых статей:
+   ```python
+   from news.models import Article, Category
+   category1 = Category.objects.get(name='Технологии')
+   category2 = Category.objects.get(name='Наука')
+   category3 = Category.objects.get(name='Спорт')
+   Article.objects.create(
+       title='Новая статья 1',
+       content='Содержание новой статьи 1',
+       publication_date='2023-10-01T12:00:00Z',
+       views=0,
+       category=category1,
+       slug='novaya-statya-1',
+       is_active=True
+   )
+   Article.objects.create(
+       title='Новая статья 2',
+       content='Содержание новой статьи 2',
+       publication_date='2023-10-02T12:00:00Z',
+       views=0,
+       category=category2,
+       slug='novaya-statya-2',
+       is_active=True
+   )
+   Article.objects.create(
+       title='Новая статья 3',
+       content='Содержание новой статьи 3',
+       publication_date='2023-10-03T12:00:00Z',
+       views=0,
+       category=category3,
+       slug='novaya-statya-3',
+       is_active=True
+   )
+   ```
+   
+#### 2. Метод `filter()`
+Метод `filter()` используется для выборки данных из таблицы.
+**Синтаксис:**
+```python
+Model.objects.filter(field1=value1, field2=value2, ...)
+```
+**Примеры:**
+1. Выборка всех статей из категории "Технологии":
+   ```python
+   from news.models import Article, Category
+   category = Category.objects.get(name='Технологии')
+   articles = Article.objects.filter(category=category)
+   ```
+2. Выборка всех активных статей:
+   ```python
+   from news.models import Article
+   active_articles = Article.objects.filter(is_active=True)
+   ```
+   
+#### 3. Метод `update()`
+Метод `update()` используется для обновления существующих записей в таблице.
+**Синтаксис:**
+```python
+Model.objects.filter(condition).update(field1=value1, field2=value2, ...)
+```
+**Примеры:**
+1. Обновление заголовка статьи с `id` 4:
+   ```python
+   from news.models import Article
+   Article.objects.filter(id=4).update(title='Обновленный заголовок')
+   ```
+2. Увеличение количества просмотров статьи с `id` 5 на 50:
+   ```python
+   from news.models import Article
+   from django.db.models import F
+   Article.objects.filter(id=5).update(views=F('views') + 50)
+   ```
+   
+#### 4. Метод `delete()`
+Метод `delete()` используется для удаления записей из таблицы.
+**Синтаксис:**
+```python
+Model.objects.filter(condition).delete()
+```
+**Примеры:**
+1. Удаление статьи с `id` 6:
+   - Удаление связанных записей в таблице `news_article_tags`:
+     ```python
+     from news.models import Article, Tag
+     article = Article.objects.get(id=6)
+     article.tags.clear()  # Удаление всех связанных тегов
+     article.delete()  # Удаление статьи
+     ```
+2. Удаление всех неактивных статей:
+   - Удаление связанных записей в таблице `news_article_tags` для всех неактивных статей:
+     ```python
+     from news.models import Article
+     inactive_articles = Article.objects.filter(is_active=False)
+     for article in inactive_articles:
+         article.tags.clear()  # Удаление всех связанных тегов
+     inactive_articles.delete()  # Удаление всех неактивных статей
+     ```
+     
+**commit: `Урок 9: те же запросы, но в Django ORM`**
