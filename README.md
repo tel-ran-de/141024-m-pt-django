@@ -1421,3 +1421,108 @@ del db.sqlite3
 - **Обработка ошибок**: Если возникнут ошибки при импорте данных, проверьте логи и исправьте проблемы в данных или в моделях `Django`.
 
 **commit: `Урок 9: перенесли данные из SQLite в PostgreSQL`**
+
+### Синтаксические конструкции для CRUD-запросов: Основы написания команд `INSERT`, `SELECT`, `UPDATE`, `DELETE`
+`CRUD` (`Create`, `Read`, `Update`, `Delete`) — это основные операции, которые выполняются с базой данных.
+В `SQL` эти операции соответствуют командам `INSERT`, `SELECT`, `UPDATE` и `DELETE`.
+Рассмотрим синтаксис каждой из этих команд и приведем по два примера для каждой операции.
+
+#### 1. Команда `INSERT`
+Команда `INSERT` используется для добавления новых записей в таблицу.
+**Синтаксис:**
+```sql
+INSERT INTO table_name (column1, column2, ...)
+VALUES (value1, value2, ...);
+```
+**Примеры:**
+1. Добавление новой категории:
+   ```sql
+   INSERT INTO news_category (name)
+   VALUES ('Новая категория');
+   ```
+2. Добавление трех новых статей:
+   ```sql
+   INSERT INTO news_article (title, content, publication_date, views, category_id, slug, is_active)
+   VALUES
+   ('Новая статья 1', 'Содержание новой статьи 1', '2023-10-01T12:00:00Z', 0, 1, 'novaya-statya-1', TRUE),
+   ('Новая статья 2', 'Содержание новой статьи 2', '2023-10-02T12:00:00Z', 0, 2, 'novaya-statya-2', TRUE),
+   ('Новая статья 3', 'Содержание новой статьи 3', '2023-10-03T12:00:00Z', 0, 3, 'novaya-statya-3', TRUE);
+   ```
+   
+#### 2. Команда `SELECT`
+Команда `SELECT` используется для выборки данных из таблицы.
+**Синтаксис:**
+```sql
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition;
+```
+**Примеры:**
+1. Выборка всех статей из категории "Технологии":
+   ```sql
+   SELECT *
+   FROM news_article
+   WHERE category_id = (SELECT id FROM news_category WHERE name = 'Технологии');
+   ```
+2. Выборка всех активных статей:
+   ```sql
+   SELECT *
+   FROM news_article
+   WHERE is_active = TRUE;
+   ```
+   
+#### 3. Команда UPDATE
+Команда `UPDATE` используется для обновления существующих записей в таблице.
+**Синтаксис:**
+```sql
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition;
+```
+**Примеры:**
+1. Обновление заголовка статьи с `id` 2:
+   ```sql
+   UPDATE news_article
+   SET title = 'Обновленный заголовок'
+   WHERE id = 2;
+   ```
+2. Увеличение количества просмотров статьи с `id` 1 на 50:
+   ```sql
+   UPDATE news_article
+   SET views = views + 50
+   WHERE id = 1;
+   ```
+   
+#### 4. Команда DELETE
+Команда `DELETE` используется для удаления записей из таблицы.
+**Синтаксис:**
+```sql
+DELETE FROM table_name
+WHERE condition;
+```
+
+**Примеры:**
+1. Удаление статьи с `id` 3:
+   - Удаление связанных записей в таблице `news_article_tags`:
+     ```sql
+     DELETE FROM news_article_tags
+     WHERE article_id = 3;
+     ```
+   - Удаление статьи из таблицы `news_article`:
+     ```sql
+     DELETE FROM news_article
+     WHERE id = 3;
+     ```
+2. Удаление всех неактивных статей:
+   - Удаление связанных записей в таблице `news_article_tags` для всех неактивных статей:
+     ```sql
+     DELETE FROM news_article_tags
+     WHERE article_id IN (SELECT id FROM news_article WHERE is_active = FALSE);
+     ```
+   - Удаление всех неактивных статей из таблицы `news_article`:
+     ```sql
+     DELETE FROM news_article
+     WHERE is_active = FALSE;
+     ```
+
+**commit: `Урок 9: посмотрели операции CRUD для SQL`**
