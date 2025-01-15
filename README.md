@@ -1860,3 +1860,40 @@ article.tags.remove(tag)
 - 
 **commit: `Урок 10: синтаксические конструкции для фильтрации и сортировки`**
 
+### Написание запросов для фильтрации и сортировки
+- **Шаблон для SQL-запросов:**
+  - **Шаблон для фильтрации:**
+    ```sql
+    SELECT column1, column2, ...
+    FROM table_name
+    WHERE condition;
+    ```
+  - **Шаблон для сортировки:**
+    ```sql
+    SELECT column1, column2, ...
+    FROM table_name
+    ORDER BY column1 [ASC|DESC], column2 [ASC|DESC], ...;
+    ```
+  - **Шаблон для фильтрации и сортировки:**
+    ```sql
+    SELECT column1, column2, ...
+    FROM table_name
+    WHERE condition
+    ORDER BY column1 [ASC|DESC], column2 [ASC|DESC], ...;
+    ```
+
+- **Шаблон для Django ORM:**
+  - **Шаблон для фильтрации:**
+    ```python
+    Model.objects.filter(condition)
+    ```
+  - **Шаблон для сортировки:**
+    ```python
+    Model.objects.order_by('field1', 'field2', ...)
+    ```
+  - **Шаблон для фильтрации и сортировки:**
+    ```python
+    Model.objects.filter(condition).order_by('field1', 'field2', ...)
+    ```
+
+**commit: `Урок 10: написание запросов для фильтрации и сортировки`**
