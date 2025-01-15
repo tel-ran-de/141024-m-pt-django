@@ -1897,3 +1897,135 @@ article.tags.remove(tag)
     ```
 
 **commit: `Урок 10: написание запросов для фильтрации и сортировки`**
+
+### Решения задач на SQL
+
+1. **Выбрать все статьи из категории "Технологии" и получить их заголовки и количество просмотров.**
+   ```sql
+   SELECT title, views FROM news_article WHERE category_id = 1;
+   ```
+
+2. **Выбрать все статьи, у которых количество просмотров больше 200, и получить их заголовки и даты публикации.**
+   ```sql
+   SELECT title, publication_date FROM news_article WHERE views > 200;
+   ```
+
+3. **Выбрать все статьи, у которых количество просмотров больше 100 и меньше 300, и получить их заголовки и количество просмотров.**
+   ```sql
+   SELECT title, views FROM news_article WHERE views > 100 AND views < 300;
+   ```
+
+4. **Выбрать все статьи, у которых количество просмотров больше 200, и получить их заголовки и названия категорий.**
+   ```sql
+   SELECT title, (SELECT name FROM news_category WHERE id = news_article.category_id) AS category_name
+   FROM news_article
+   WHERE views > 200;
+   ```
+
+5. **Выбрать все статьи из категории "Технологии" или "Наука" и получить их заголовки и названия категорий.**
+   ```sql
+   SELECT title, (SELECT name FROM news_category WHERE id = news_article.category_id) AS category_name
+   FROM news_article
+   WHERE category_id IN (1, 2);
+   ```
+
+6. **Выбрать все статьи, у которых количество просмотров больше 200, и отсортировать их по дате публикации в порядке убывания, получить их заголовки и даты публикации.**
+   ```sql
+   SELECT title, publication_date FROM news_article WHERE views > 200 ORDER BY publication_date DESC;
+   ```
+
+7. **Выбрать все статьи, у которых количество просмотров больше 200, и отсортировать их по количеству просмотров в порядке убывания, получить их заголовки и количество просмотров.**
+   ```sql
+   SELECT title, views FROM news_article WHERE views > 200 ORDER BY views DESC;
+   ```
+
+8. **Выбрать все статьи, у которых количество просмотров меньше 300, и отсортировать их по категории и дате публикации, получить их заголовки и даты публикации.**
+   ```sql
+   SELECT title, publication_date FROM news_article WHERE views < 300 ORDER BY category_id, publication_date;
+   ```
+
+9. **Выбрать все статьи, у которых количество просмотров больше или равно 200, и отсортировать их по категории в порядке возрастания и дате публикации в порядке убывания, получить их заголовки и даты публикации.**
+   ```sql
+   SELECT title, publication_date FROM news_article WHERE views >= 200 ORDER BY category_id ASC, publication_date DESC;
+   ```
+
+10. **Выбрать все статьи, у которых количество просмотров между 220 и 270, и отсортировать их по категории в порядке убывания и дате публикации в порядке возрастания, получить их заголовки и даты публикации.**
+    ```sql
+    SELECT title, publication_date FROM news_article WHERE views BETWEEN 220 AND 270 ORDER BY category_id DESC, publication_date ASC;
+    ```
+
+11. **Выбрать все статьи, у которых количество просмотров не больше 200, и отсортировать их по категории и количеству просмотров в порядке убывания, получить их заголовки и количество просмотров.**
+    ```sql
+    SELECT title, views FROM news_article WHERE views <= 200 ORDER BY category_id, views DESC;
+    ```
+
+12. **Выбрать все статьи, у которых количество просмотров больше 300 и меньше 200, и отсортировать их по категории в порядке возрастания и количеству просмотров в порядке убывания, получить их заголовки и количество просмотров.**
+    ```sql
+    SELECT title, views FROM news_article WHERE views > 300 AND views < 200 ORDER BY category_id ASC, views DESC;
+    ```
+
+### Решения задач на Django ORM
+
+1. **Выбрать все статьи из категории "Технологии" и получить их заголовки и количество просмотров.**
+   ```python
+   articles = Article.objects.filter(category_id=1).values('title', 'views')
+   ```
+
+2. **Выбрать все статьи, у которых количество просмотров больше 200, и получить их заголовки и даты публикации.**
+   ```python
+   articles = Article.objects.filter(views__gt=200).values('title', 'publication_date')
+   ```
+
+3. **Выбрать все статьи, у которых количество просмотров больше 100 и меньше 300, и получить их заголовки и количество просмотров.**
+   ```python
+   articles = Article.objects.filter(views__gt=100, views__lt=300).values('title', 'views')
+   ```
+
+4. **Выбрать все статьи, у которых количество просмотров больше 200, и получить их заголовки и названия категорий.**
+   ```python
+   from django.db.models import OuterRef, Subquery
+   articles = Article.objects.filter(views__gt=200).annotate(category_name=Subquery(Category.objects.filter(id=OuterRef('category_id')).values('name')[:1])).values('title', 'category_name')
+   ```
+
+5. **Выбрать все статьи из категории "Технологии" или "Наука" и получить их заголовки и названия категорий.**
+   ```python
+   from django.db.models import Q, OuterRef, Subquery
+   articles = Article.objects.filter(Q(category_id=1) | Q(category_id=2)).annotate(category_name=Subquery(Category.objects.filter(id=OuterRef('category_id')).values('name')[:1])).values('title', 'category_name')
+   ```
+
+6. **Выбрать все статьи, у которых количество просмотров больше 200, и отсортировать их по дате публикации в порядке убывания, получить их заголовки и даты публикации.**
+   ```python
+   articles = Article.objects.filter(views__gt=200).order_by('-publication_date').values('title', 'publication_date')
+   ```
+
+7. **Выбрать все статьи, у которых количество просмотров больше 200, и отсортировать их по количеству просмотров в порядке убывания, получить их заголовки и количество просмотров.**
+   ```python
+   articles = Article.objects.filter(views__gt=200).order_by('-views').values('title', 'views')
+   ```
+
+8. **Выбрать все статьи, у которых количество просмотров меньше 300, и отсортировать их по категории и дате публикации, получить их заголовки и даты публикации.**
+   ```python
+   articles = Article.objects.filter(views__lt=300).order_by('category_id', 'publication_date').values('title', 'publication_date')
+   ```
+
+9. **Выбрать все статьи, у которых количество просмотров больше или равно 200, и отсортировать их по категории в порядке возрастания и дате публикации в порядке убывания, получить их заголовки и даты публикации.**
+   ```python
+   articles = Article.objects.filter(views__gte=200).order_by('category_id', '-publication_date').values('title', 'publication_date')
+   ```
+
+10. **Выбрать все статьи, у которых количество просмотров между 220 и 270, и отсортировать их по категории в порядке убывания и дате публикации в порядке возрастания, получить их заголовки и даты публикации.**
+    ```python
+    articles = Article.objects.filter(views__range=(220, 270)).order_by('-category_id', 'publication_date').values('title', 'publication_date')
+    ```
+
+11. **Выбрать все статьи, у которых количество просмотров не больше 200, и отсортировать их по категории и количеству просмотров в порядке убывания, получить их заголовки и количество просмотров.**
+    ```python
+    articles = Article.objects.filter(views__lte=200).order_by('category_id', '-views').values('title', 'views')
+    ```
+
+12. **Выбрать все статьи, у которых количество просмотров больше 300 и меньше 200, и отсортировать их по категории в порядке возрастания и количеству просмотров в порядке убывания, получить их заголовки и количество просмотров.**
+    ```python
+    articles = Article.objects.filter(views__gt=300, views__lt=200).order_by('category_id', '-views').values('title', 'views')
+    ```
+
+**commit: `Урок 10: решение практики`**
