@@ -1,30 +1,15 @@
-{% comment %}
-    Нужно распарсить эти поля:
-    title
-    content
-    category
-    tags
-    id_author
-    id_article
-    upload_date
-    views_count
-    favorites_count
-{% endcomment %}
-<!-- Краткое представление новости news/templates/include/article_preview.html -->
 <!-- Краткое представление новости news/templates/include/article_preview.html -->
 <div class="card" style="width: 18rem;">
     <div class="card-body">
-      <h5 class="card-title">{{ article.title }}</h5>
-      <p class="card-text">{{ article.content|truncatechars:50 }}</p>
-      <p class="card-text">{{ article.category }}</p>
-      {% for tag in article.tags.all %}
-        <span class="badge bg-info">{{ tag }}</span>
-      {% endfor %}
-      <p class="card-text">{{ article.id_author }}</p>
-      <p class="card-text">{{ article.id_card }}</p>
-      <p class="card-text">{{ article.upload_date }}</p>
-      <p class="card-text">{{ article.views_count }}</p>
-      <p class="card-text">{{ article.favorites_count }}</p>
-      <a href="{% url 'detail_article_by_id' article.id %}" class="btn btn-primary">Подробнее</a>
+        <h5 class="card-title">#{{ article.id }}. {{ article.title }}</h5>
+        <p class="card-text">{{ article.content|truncatechars:50 }}</p>
+        <p class="card-text">{{ article.category }}</p>
+        {% for tag in article.tags.all %}
+            <span class="badge bg-info">{{ tag }}</span>
+        {% endfor %}
+        <p class="card-text">{{ article.publication_date }}</p>
+        <p class="card-text">{{ article.views }}</p>
+        <p class="card-text">{{ article.favorites_count }}</p>
+        <a href="{% url 'detail_article_by_id' article.id %}" class="btn btn-primary">Подробнее</a>
     </div>
 </div>

@@ -2040,3 +2040,163 @@ article.tags.remove(tag)
 Чтобы исправить эту ошибку, вам нужно использовать `article.tags.all()` для получения всех тегов, связанных с конкретной статьей.
 
 **commit: `Урок 11: исправили шаблоны карточек для отображения тегов новостей`**
+
+### Улучшение внешнего вида и пользовательского интерфейса приложения
+
+1. **Обновление базового шаблона (base.html):**
+   - **Изменения:**
+     - Добавлены стили для фона и текста:
+       ```html
+       <style>
+           body {
+               background-color: #f8f9fa;
+               color: #343a40;
+           }
+           .navbar {
+               background-color: #343a40;
+           }
+           .navbar-nav .nav-link {
+               color: #ffffff;
+           }
+           .navbar-nav .nav-link\:hover {
+               color: #ffc107;
+           }
+           .card {
+               margin-bottom: 20px;
+           }
+           .footer {
+               background-color: #343a40;
+               color: #ffffff;
+               text-align: center;
+               padding: 10px 0;
+           }
+       </style>
+       ```
+     - Обновлены структура и стили навигационного меню:
+       ```html
+       <nav class="navbar navbar-expand-lg navbar-dark">
+           <div class="container-fluid">
+               <a class="navbar-brand" href="#">Info to Go</a>
+               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                   <span class="navbar-toggler-icon"></span>
+               </button>
+               <div class="collapse navbar-collapse" id="navbarNav">
+                   <ul class="navbar-nav ms-auto">
+                       {% include "include/nav_menu.html" %}
+                   </ul>
+               </div>
+           </div>
+       </nav>
+       ```
+   - **Причина:**
+     - Улучшение общего внешнего вида приложения и повышение удобства использования.
+
+2. **Обновление шаблона about.html:**
+   - **Изменения:**
+     - Добавлены классы Bootstrap для центрирования текста и улучшения отступов:
+       ```html
+       <h1 class="text-center mb-4">О сайте</h1>
+       <p class="text-center">Добро пожаловать на наш сайт!</p>
+       <p class="text-center">На нашем сайте, новостей {{ news_count }}, пользователей {{ users_count }}.</p>
+       ```
+   - **Причина:**
+     - Улучшение читаемости и внешнего вида страницы "О сайте".
+
+3. **Обновление шаблона main.html:**
+   - **Изменения:**
+     - Добавлены классы Bootstrap для центрирования текста и улучшения отступов:
+       ```html
+       <h1 class="text-center mb-4">Главная страница</h1>
+       <p class="text-center">Добро пожаловать на сайт!</p>
+       <p class="text-center">На нашем сайте, новостей {{ news_count }}, пользователей {{ users_count }}.</p>
+       ```
+   - **Причина:**
+     - Улучшение читаемости и внешнего вида главной страницы.
+
+4. **Обновление шаблона catalog.html:**
+   - **Изменения:**
+     - Добавлены классы Bootstrap для центрирования текста и улучшения отступов:
+       ```html
+       <h1 class="text-center mb-4">Каталог новостей Info to Go</h1>
+       <p class="text-center">Всего новостей: {{ news_count }}</p>
+       <p class="text-center">Всего пользователей: {{ users_count }}</p>
+       ```
+     - Добавлены классы Bootstrap для создания сетки из двух колонок для карточек новостей:
+       ```html
+       <div class="row">
+           {% for article in news %}
+               <div class="col-md-6 mb-4">
+                   {% include "include/article_preview.html" with article=article %}
+               </div>
+           {% endfor %}
+       </div>
+       ```
+   - **Причина:**
+     - Улучшение читаемости и внешнего вида страницы каталога новостей, а также улучшение отображения карточек новостей.
+
+5. **Обновление шаблона article_detail.html:**
+   - **Изменения:**
+     - Добавлены классы Bootstrap для улучшения внешнего вида карточки новости:
+       ```html
+       <div class="card">
+           <div class="card-body">
+               <h5 class="card-title">{% upper_words article.title %}</h5>
+               <p class="card-text">{{ article.content }}</p>
+               <p class="card-text">{{ article.category }}</p>
+               {% for tag in article.tags.all %}
+                   <span class="badge bg-info">{{ tag }}</span>
+               {% endfor %}
+               <p class="card-text">{{ article.id_author }}</p>
+               <p class="card-text">{{ article.id }}</p>
+               <p class="card-text">{{ article.publication_date }}</p>
+               <p class="card-text">{{ article.views }}</p>
+               <p class="card-text">{{ article.favorites_count }}</p>
+           </div>
+       </div>
+       ```
+   - **Причина:**
+     - Улучшение читаемости и внешнего вида страницы детального представления новости.
+
+6. **Обновление шаблона article_preview.html:**
+   - **Изменения:**
+     - Добавлены классы Bootstrap для улучшения внешнего вида карточки новости:
+       ```html
+       <div class="card">
+           <div class="card-body">
+               <h5 class="card-title">{{ article.title }}</h5>
+               <p class="card-text">{{ article.content|truncatechars:50 }}</p>
+               <p class="card-text">{{ article.category }}</p>
+               {% for tag in article.tags.all %}
+                   <span class="badge bg-info">{{ tag }}</span>
+               {% endfor %}
+               <p class="card-text">{{ article.id_author }}</p>
+               <p class="card-text">{{ article.id }}</p>
+               <p class="card-text">{{ article.publication_date }}</p>
+               <p class="card-text">{{ article.views }}</p>
+               <p class="card-text">{{ article.favorites_count }}</p>
+               <a href="{% url 'detail_article_by_id' article.id %}" class="btn btn-primary">Подробнее</a>
+           </div>
+       </div>
+       ```
+   - **Причина:**
+     - Улучшение читаемости и внешнего вида краткого представления новости.
+
+7. **Обновление шаблона nav_menu.html:**
+   - **Изменения:**
+     - Добавлены классы Bootstrap для улучшения внешнего вида навигационного меню:
+       ```html
+       <ul class="navbar-nav">
+           {% for item in menu %}
+               <li class="nav-item">
+                   <a class="nav-link" href="{% url item.url_name %}">{{ item.title }}</a>
+               </li>
+               {% if not forloop.last %}
+                   <li class="nav-item"><hr class="dropdown-divider"/></li>
+               {% endif %}
+           {% endfor %}
+       </ul>
+       ```
+   - **Причина:**
+     - Улучшение читаемости и внешнего вида навигационного меню.
+
+**commit: `Урок 11: исправили вёрстку, добавили адаптивности, поправили отступы`**

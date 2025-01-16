@@ -3,19 +3,17 @@
 {% comment %} Этот шаблон расширяет базовый шаблон base.html {% endcomment %}
 {% comment %} news/templates/news/catalog.html {% endcomment %}
 
-{% block title %}
-    Каталог новостей Info to Go
-{% endblock %}
+{% block title %}Каталог новостей Info to Go{% endblock %}
 
 {% block content %}
-  <h1>Каталог новостей Info to Go</h1>
-  <p>Всего новостей: {{ news_count }}</p>
-  <p>Всего пользователей: {{ users_count }}</p>
-    <ul>
+    <h1 class="text-center mb-4">Каталог новостей Info to Go</h1>
+    <p class="text-center">Всего новостей: {{ news_count }}</p>
+    <p class="text-center">Всего пользователей: {{ users_count }}</p>
+    <div class="row">
         {% for article in news %}
-            <li>
-                {% include "include/article_preview.html" %}
-            </li>
+            <div class="col-md-6 mb-4">
+                {% include "include/article_preview.html" with article=article %}
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}

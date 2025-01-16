@@ -1,16 +1,10 @@
-<!-- Меню вставлено через include в базовый шаблон-->
-<nav>
-    <ul>
-      <!-- Цикл на синтаксисе шаблонизатора -->
-      <!-- Если последний, то после него не будет проведена черта <hr/> -->
-      {% for item in menu %}
-        <li>
-          <!--  Урлы через имена. Урлы будут добываться из urls.py автоматически-->
-          <a href="{% url item.url_name %}">{{ item.title }}</a>
+<ul class="navbar-nav">
+    {% for item in menu %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url item.url_name %}">{{ item.title }}</a>
         </li>
         {% if not forloop.last %}
-          <hr/>
+            <li class="nav-item"><hr class="dropdown-divider"/></li>
         {% endif %}
-      {% endfor %}
-    </ul>
-</nav>
+    {% endfor %}
+</ul>
