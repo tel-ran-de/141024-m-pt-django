@@ -2268,3 +2268,28 @@ else:
   - `/news/?sort=publication_date&order=desc` будет сортировать новости по дате загрузки по убыванию.
 
 **commit: `Урок 11: добавили сортировку по датам или по просмотрам`**
+
+### Подготовка базы данных для экспериментов с джоинами
+**Изменение поля `category_id` в таблице `news_article`. Теперь поле может быть пустым:**
+```sql
+ALTER TABLE news_article ALTER COLUMN category_id DROP NOT NULL;
+```
+
+**Добавление двух новых категорий:**
+```sql
+INSERT INTO news_category (name) VALUES ('Погода');
+INSERT INTO news_category (name) VALUES ('СРОЧНО');
+```
+
+**Очистка категории у некоторых статей**
+Этот запрос обновляет таблицу `news_article`, устанавливая значение `category_id` в `NULL` для всех статей,
+содержание которых не содержит слов 'городе' и 'довольны'.
+Оператор `NOT LIKE` используется для проверки, что строка не содержит указанного шаблона.
+```sql
+UPDATE news_article
+SET category_id = NULL
+WHERE content NOT LIKE '%городе%'
+  AND content NOT LIKE '%довольны%';
+```
+
+**commit: `Урок 11: изменили записи в БД чтобы посмотреть на работу джоинов`**
