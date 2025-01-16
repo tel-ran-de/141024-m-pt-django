@@ -62,8 +62,32 @@ def get_category_by_name(request, slug):
 
 
 def get_all_news(request):
+    """Функция для отображения страницы "Каталог"
+    будет возвращать рендер шаблона /templates/news/catalog.html
+    - **`sort`** - ключ для указания типа сортировки с возможными значениями: `publication_date`, `views`.
+    - **`order`** - опциональный ключ для указания направления сортировки с возможными значениями: `asc`, `desc`. По умолчанию `desc`.
+    1. Сортировка по дате добавления в убывающем порядке (по умолчанию): `/news/catalog/`
+    2. Сортировка по количеству просмотров в убывающем порядке: `/news/catalog/?sort=views`
+    3. Сортировка по количеству просмотров в возрастающем порядке: `/news/catalog/?sort=views&order=asc`
+    4. Сортировка по дате добавления в возрастающем порядке: `/news/catalog/?sort=publication_date&order=asc`
+    """
 
-    articles = Article.objects.select_related('category').prefetch_related('tags')
+    # считаем параметры из GET-запроса
+    sort = request.GET.get('sort', 'publication_date')  # по умолчанию сортируем по дате загрузки
+    order = request.GET.get('order', 'desc')  # по умолчанию сортируем по убыванию
+
+    # Проверяем дали ли мы разрешение на сортировку по этому полю
+    valid_sort_fields = {'publication_date', 'views'}
+    if sort not in valid_sort_fields:
+        sort = 'publication_date'
+
+    # Обрабатываем направление сортировки
+    if order == 'asc':
+        order_by = sort
+    else:
+        order_by = f'-{sort}'
+
+    articles = Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
 
     context = {
         'news': articles,
