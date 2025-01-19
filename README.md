@@ -2377,3 +2377,436 @@ for result in results:
 ```
 
 **commit: `Урок 12: рассмотрели работу агрегационных функций в SQL и в Django ORM`**
+
+### решение практики
+
+#### Задача 1: Получите список всех статей и их категорий.
+
+**PostgreSQL:**
+```sql
+SELECT a.id, a.title, a.content, a.views, a.published_date, c.name AS category_name
+FROM articles a
+LEFT JOIN categories c ON a.category_id = c.id;
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.select_related('category').all()
+for article in articles:
+    print(article.title, article.category.name if article.category else 'No category')
+```
+
+#### Задача 2: Получите список всех статей и их тегов.
+
+**PostgreSQL:**
+```sql
+SELECT a.id, a.title, a.content, a.views, a.published_date, t.name AS tag_name
+FROM articles a
+LEFT JOIN article_tags at ON a.id = at.article_id
+LEFT JOIN tags t ON at.tag_id = t.id;
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.prefetch_related('tags').all()
+for article in articles:
+    print(article.title, [tag.name for tag in article.tags.all()])
+```
+
+#### Задача 3: Получите список всех статей, которые не имеют категории.
+
+**PostgreSQL:**
+```sql
+SELECT *
+FROM articles
+WHERE category_id IS NULL;
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(category__isnull=True)
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 4: Получите список всех статей, которые не имеют тегов.
+
+**PostgreSQL:**
+```sql
+SELECT a.*
+FROM articles a
+LEFT JOIN article_tags at ON a.id = at.article_id
+WHERE at.article_id IS NULL;
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(tags__isnull=True)
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 5: Получите список всех категорий и связанных с ними статей.
+
+**PostgreSQL:**
+```sql
+SELECT c.id, c.name, a.id AS article_id, a.title
+FROM categories c
+LEFT JOIN articles a ON c.id = a.category_id;
+```
+
+**Django ORM:**
+```python
+categories = Category.objects.prefetch_related('article_set').all()
+for category in categories:
+    print(category.name, [article.title for article in category.article_set.all()])
+```
+
+#### Задача 6: Получите список всех тегов и связанных с ними статей.
+
+**PostgreSQL:**
+```sql
+SELECT t.id, t.name, a.id AS article_id, a.title
+FROM tags t
+LEFT JOIN article_tags at ON t.id = at.tag_id
+LEFT JOIN articles a ON at.article_id = a.id;
+```
+
+**Django ORM:**
+```python
+tags = Tag.objects.prefetch_related('article_set').all()
+for tag in tags:
+    print(tag.name, [article.title for article in tag.article_set.all()])
+```
+
+#### Задача 7: Получите список всех статей, которые содержат слово "пауки" в заголовке или содержании.
+
+**PostgreSQL:**
+```sql
+SELECT *
+FROM articles
+WHERE title ILIKE '%пауки%' OR content ILIKE '%пауки%';
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(models.Q(title__icontains='пауки') | models.Q(content__icontains='пауки'))
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 8*: Получите список всех статей с их тегами (теги для каждой строки нужно свернуть в одну ячейку), которые были опубликованы в 2023 году.
+
+**PostgreSQL:**
+```sql
+SELECT a.id, a.title, a.content, a.views, a.published_date, STRING_AGG(t.name, ', ') AS tags
+FROM articles a
+LEFT JOIN article_tags at ON a.id = at.article_id
+LEFT JOIN tags t ON at.tag_id = t.id
+WHERE a.published_date BETWEEN '2023-01-01' AND '2023-12-31'
+GROUP BY a.id;
+```
+
+**Django ORM:**
+```python
+from django.db.models import Prefetch
+
+articles = Article.objects.filter(published_date__year=2023).prefetch_related(
+    Prefetch('tags', queryset=Tag.objects.all(), to_attr='tag_list')
+)
+for article in articles:
+    print(article.title, ', '.join([tag.name for tag in article.tag_list]))
+```
+
+#### Задача 9: Получите список всех статей, которые имеют более 120 просмотров и были опубликованы НЕ в 2023 году.
+
+**PostgreSQL:**
+```sql
+SELECT *
+FROM articles
+WHERE views > 120 AND published_date NOT BETWEEN '2023-01-01' AND '2023-12-31';
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(views__gt=120).exclude(published_date__year=2023)
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 10: Получите список всех статей, которые принадлежат к категории "Наука" или "Технологии".
+
+**PostgreSQL:**
+```sql
+SELECT a.*
+FROM articles a
+JOIN categories c ON a.category_id = c.id
+WHERE c.name IN ('Наука', 'Технологии');
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(category__name__in=['Наука', 'Технологии'])
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 11: Получите список всех статей, которые имеют тег НЕ "Здоровье" и не "Ученые" и при этом имеют меньше 200 просмотров.
+
+**PostgreSQL:**
+```sql
+SELECT a.*
+FROM articles a
+LEFT JOIN article_tags at ON a.id = at.article_id
+LEFT JOIN tags t ON at.tag_id = t.id
+WHERE t.name NOT IN ('Здоровье', 'Ученые') AND a.views < 200;
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.exclude(tags__name__in=['Здоровье', 'Ученые']).filter(views__lt=200)
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 12: Получите список всех статей, которые не имеют категории и не содержат слова "городе" и "довольны" в содержании.
+
+**PostgreSQL:**
+```sql
+SELECT *
+FROM articles
+WHERE category_id IS NULL AND content NOT ILIKE '%городе%' AND content NOT ILIKE '%довольны%';
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(category__isnull=True).exclude(content__icontains='городе').exclude(content__icontains='довольны')
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 13: Вывести все статьи, опубликованные в октябре 2023 года.
+
+**PostgreSQL:**
+```sql
+SELECT *
+FROM articles
+WHERE published_date BETWEEN '2023-10-01' AND '2023-10-31';
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(published_date__year=2023, published_date__month=10)
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 14: Найти категории, у которых среднее количество просмотров статей больше 200.
+
+**PostgreSQL:**
+```sql
+SELECT c.id, c.name, AVG(a.views) AS average_views
+FROM categories c
+JOIN articles a ON c.id = a.category_id
+GROUP BY c.id
+HAVING AVG(a.views) > 200;
+```
+
+**Django ORM:**
+```python
+from django.db.models import Avg
+
+categories = Category.objects.annotate(average_views=Avg('article__views')).filter(average_views__gt=200)
+for category in categories:
+    print(category.name, category.average_views)
+```
+
+#### Задача 15: Получить список всех категорий и количество статей в каждой категории.
+
+**PostgreSQL:**
+```sql
+SELECT c.id, c.name, COUNT(a.id) AS article_count
+FROM categories c
+LEFT JOIN articles a ON c.id = a.category_id
+GROUP BY c.id;
+```
+
+**Django ORM:**
+```python
+from django.db.models import Count
+
+categories = Category.objects.annotate(article_count=Count('article'))
+for category in categories:
+    print(category.name, category.article_count)
+```
+
+#### Задача 16: Найти статьи, которые принадлежат категории "Технологии" или "Наука".
+
+**PostgreSQL:**
+```sql
+SELECT a.*
+FROM articles a
+JOIN categories c ON a.category_id = c.id
+WHERE c.name IN ('Технологии', 'Наука');
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(category__name__in=['Технологии', 'Наука'])
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 17: Найти категории, у которых максимальное количество просмотров статьи больше 300.
+
+**PostgreSQL:**
+```sql
+SELECT c.id, c.name, MAX(a.views) AS max_views
+FROM categories c
+JOIN articles a ON c.id = a.category_id
+GROUP BY c.id
+HAVING MAX(a.views) > 300;
+```
+
+**Django ORM:**
+```python
+from django.db.models import Max
+
+categories = Category.objects.annotate(max_views=Max('article__views')).filter(max_views__gt=300)
+for category in categories:
+    print(category.name, category.max_views)
+```
+
+#### Задача 18: Получить список всех тегов и количество статей, связанных с каждым тегом.
+
+**PostgreSQL:**
+```sql
+SELECT t.id, t.name, COUNT(a.id) AS article_count
+FROM tags t
+LEFT JOIN article_tags at ON t.id = at.tag_id
+LEFT JOIN articles a ON at.article_id = a.id
+GROUP BY t.id;
+```
+
+**Django ORM:**
+```python
+from django.db.models import Count
+
+tags = Tag.objects.annotate(article_count=Count('article'))
+for tag in tags:
+    print(tag.name, tag.article_count)
+```
+
+#### Задача 19: Найти статьи, которые не принадлежат ни одной категории.
+
+**PostgreSQL:**
+```sql
+SELECT *
+FROM articles
+WHERE category_id IS NULL;
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(category__isnull=True)
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 20: Вывести статьи, у которых заголовок содержит слово "летающие".
+
+**PostgreSQL:**
+```sql
+SELECT *
+FROM articles
+WHERE title ILIKE '%летающие%';
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(title__icontains='летающие')
+for article in articles:
+    print(article.title)
+```
+
+#### Задача 21: Получить список всех статей и их категорий, отсортированных по количеству просмотров в порядке убывания.
+
+**PostgreSQL:**
+```sql
+SELECT a.id, a.title, a.content, a.views, a.published_date, c.name AS category_name
+FROM articles a
+LEFT JOIN categories c ON a.category_id = c.id
+ORDER BY a.views DESC;
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.select_related('category').order_by('-views')
+for article in articles:
+    print(article.title, article.category.name if article.category else 'No category')
+```
+
+#### Задача 22: Найти теги, у которых сумма просмотров статей больше 1000.
+
+**PostgreSQL:**
+```sql
+SELECT t.id, t.name, SUM(a.views) AS total_views
+FROM tags t
+LEFT JOIN article_tags at ON t.id = at.tag_id
+LEFT JOIN articles a ON at.article_id = a.id
+GROUP BY t.id
+HAVING SUM(a.views) > 1000;
+```
+
+**Django ORM:**
+```python
+from django.db.models import Sum
+
+tags = Tag.objects.annotate(total_views=Sum('article__views')).filter(total_views__gt=1000)
+for tag in tags:
+    print(tag.name, tag.total_views)
+```
+
+#### Задача 23: Получить список всех статей и их тегов, отсортированных по дате публикации.
+
+**PostgreSQL:**
+```sql
+SELECT a.id, a.title, a.content, a.views, a.published_date, STRING_AGG(t.name, ', ') AS tags
+FROM articles a
+LEFT JOIN article_tags at ON a.id = at.article_id
+LEFT JOIN tags t ON at.tag_id = t.id
+GROUP BY a.id
+ORDER BY a.published_date;
+```
+
+**Django ORM:**
+```python
+from django.db.models import Prefetch
+
+articles = Article.objects.prefetch_related(
+    Prefetch('tags', queryset=Tag.objects.all(), to_attr='tag_list')
+).order_by('published_date')
+for article in articles:
+    print(article.title, ', '.join([tag.name for tag in article.tag_list]))
+```
+
+#### Задача 24: Найти статьи, которые принадлежат категории "Спорт" и имеют тег "Футбол".
+
+**PostgreSQL:**
+```sql
+SELECT a.*
+FROM articles a
+JOIN categories c ON a.category_id = c.id
+JOIN article_tags at ON a.id = at.article_id
+JOIN tags t ON at.tag_id = t.id
+WHERE c.name = 'Спорт' AND t.name = 'Футбол';
+```
+
+**Django ORM:**
+```python
+articles = Article.objects.filter(category__name='Спорт', tags__name='Футбол')
+for article in articles:
+    print(article.title)
+```
+
+**commit: `Урок 12: решили финальную практику по SQL и Django ORM`**
