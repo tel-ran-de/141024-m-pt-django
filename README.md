@@ -2885,3 +2885,32 @@ admin.site.register(Article, ArticleAdmin)
 ```
 
 **commit: `Урок 13: добавили поиск в админ-панель`**
+
+### Добавление пользовательского поля в админ-панели
+
+#### models.py
+```python
+from django.utils.html import format_html
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'publication_date', 'views', 'is_active', 'colored_status')
+    def colored_status(self, obj):
+        return format_html('<span style="color: {};">{}</span>', 'green' if obj.is_active else 'red', obj.is_active)
+    colored_status.short_description = 'Статус'
+admin.site.register(Article, ArticleAdmin)
+```
+
+#### Дополнение
+В `models.py` добавили пользовательский менеджер модели `AllArticleManager` для того чтобы получать список статей вне зависимости от поля `is_active`.
+```python
+class AllArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
+```
+
+В `admin.py` добавили метод `get_queryset` в класс `ArticleAdmin` для того чтобы получать список статей вне зависимости от поля `is_active`.
+```python
+    def get_queryset(self, request):
+        return Article.all_objects.get_queryset()
+```
+
+**commit: `Урок 13: добавили пользовательское поле в админ-панель`

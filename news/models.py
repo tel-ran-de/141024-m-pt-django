@@ -12,6 +12,11 @@ class ArticleManager(models.Manager):
         return self.get_queryset().all().order_by('-title')
 
 
+class AllArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset()
+
+
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -37,6 +42,7 @@ class Article(models.Model):
     is_active = models.BooleanField(default=True)
 
     objects = ArticleManager()
+    all_objects = AllArticleManager()
 
     def save(self, *args, **kwargs):
         # Сохраняем статью, чтобы получить id
