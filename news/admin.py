@@ -9,6 +9,18 @@ admin.site.site_title = "Info to Go Admin Portal"
 admin.site.index_title = "Welcome to ITG Admin Portal"
 
 
+def make_inactive(modeladmin, request, queryset):
+    queryset.update(is_active=False)
+
+
+def make_active(modeladmin, request, queryset):
+    queryset.update(is_active=True)
+
+
+make_inactive.short_description = 'Сделать неактивными выбранные статьи'
+make_active.short_description = 'Сделать активными выбранные статьи'
+
+
 class ArticleAdmin(admin.ModelAdmin):
     # list_display отображает поля в таблице
     list_display = ('title', 'category', 'publication_date', 'views', 'colored_status')
@@ -16,6 +28,7 @@ class ArticleAdmin(admin.ModelAdmin):
     list_filter = ('category', 'is_active')
     # search_fields позволяет искать по полям
     search_fields = ('title', 'content')
+    actions = [make_inactive, make_active]
 
     def get_queryset(self, request):
         return Article.all_objects.get_queryset()

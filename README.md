@@ -2914,3 +2914,19 @@ class AllArticleManager(models.Manager):
 ```
 
 **commit: `Урок 13: добавили пользовательское поле в админ-панель`
+
+### Добавление дополнительных действий в админ-панели (сделать неактивными выбранные статьи)
+
+#### models.py
+```python
+def make_inactive(modeladmin, request, queryset):
+    queryset.update(is_active=False)
+    
+make_inactive.short_description = "Сделать неактивными выбранные статьи
+    
+class ArticleAdmin(admin.ModelAdmin):
+    ...
+    actions = [make_inactive]
+    ...
+```
+**commit: `Урок 13: добавили дополнительные действия в админ-панель`
