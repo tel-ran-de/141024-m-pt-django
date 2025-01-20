@@ -2872,3 +2872,16 @@ admin.site.register(Article, ArticleAdmin)
 ```
 
 **commit: `Урок 13: добавили фильтры в админ-панель`**
+
+### Добавление поиска в админ-панели
+
+#### models.py
+```python
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'publication_date', 'views', 'is_active')
+    list_filter = ('category', 'is_active')
+    search_fields = ('title', 'content')
+admin.site.register(Article, ArticleAdmin)
+```
+
+**commit: `Урок 13: добавили поиск в админ-панель`**

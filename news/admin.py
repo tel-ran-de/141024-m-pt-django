@@ -13,6 +13,8 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'publication_date', 'views', 'is_active')
     # list_filter позволяет фильтровать по полям
     list_filter = ('category', 'is_active')
+    # search_fields позволяет искать по полям
+    search_fields = ('title', 'content')
 
 
 admin.site.register(Article, ArticleAdmin)
