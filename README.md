@@ -2824,3 +2824,15 @@ for article in articles:
 - если пароль слишком короткий, слишком общий или похож на имя пользователя, то будет предложено ввести другой пароль или согласиться предупреждениями
 
 **commit: `Урок 13: создали суперпользователя`**
+
+### Регистрация моделей в админ-панели
+
+#### models.py
+```python
+from .models import Article, Category, Tag
+admin.site.register(Article)
+admin.site.register(Category)
+admin.site.register(Tag)
+```
+
+**commit: `Урок 13: зарегистрировали модели в админ-панели`**
