@@ -2836,3 +2836,16 @@ admin.site.register(Tag)
 ```
 
 **commit: `Урок 13: зарегистрировали модели в админ-панели`**
+
+### Изменение заголовка, подзаголовка и тд в админ-панели
+
+#### models.py
+```python
+admin.site.site_header = "Info to Go Admin Portal"
+admin.site.site_title = "Info to Go Admin Portal"
+admin.site.index_title = "Welcome to ITG Admin Portal"
+```
+
+В `settings.py` можно изменить язык админ-панели в константе `LANGUAGE_CODE`
+
+**commit: `Урок 13: изменили заголовки в административной панели`**
