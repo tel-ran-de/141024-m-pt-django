@@ -2930,3 +2930,15 @@ class ArticleAdmin(admin.ModelAdmin):
     ...
 ```
 **commit: `Урок 13: добавили дополнительные действия в админ-панель`
+
+### Настройка отображения полей в админ-панели
+
+#### models.py
+```python
+class ArticleAdmin(admin.ModelAdmin):
+    ...
+    fields = ('title', 'content', 'category', 'tags', 'is_active')
+    ...
+```
+
+**commit: `Урок 13: настроили отображение полей в админ-панели`
