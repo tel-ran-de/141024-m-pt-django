@@ -9,7 +9,10 @@ admin.site.index_title = "Welcome to ITG Admin Portal"
 
 
 class ArticleAdmin(admin.ModelAdmin):
+    # list_display отображает поля в таблице
     list_display = ('title', 'category', 'publication_date', 'views', 'is_active')
+    # list_filter позволяет фильтровать по полям
+    list_filter = ('category', 'is_active')
 
 
 admin.site.register(Article, ArticleAdmin)
