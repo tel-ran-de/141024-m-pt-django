@@ -2849,3 +2849,14 @@ admin.site.index_title = "Welcome to ITG Admin Portal"
 В `settings.py` можно изменить язык админ-панели в константе `LANGUAGE_CODE`
 
 **commit: `Урок 13: изменили заголовки в административной панели`**
+
+### Настройка полей в отображении статей в админ-панели
+
+#### models.py
+```python
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'publication_date', 'views', 'is_active')
+admin.site.register(Article, ArticleAdmin)
+```
+
+**commit: `Урок 13: настроили поля в отображении статей в админ-панели`**

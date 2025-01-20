@@ -8,6 +8,10 @@ admin.site.site_title = "Info to Go Admin Portal"
 admin.site.index_title = "Welcome to ITG Admin Portal"
 
 
-admin.site.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'publication_date', 'views', 'is_active')
+
+
+admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category)
 admin.site.register(Tag)
