@@ -33,10 +33,13 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'title')
     # list_filter позволяет фильтровать по полям
     list_filter = ('category', 'is_active')
+    # сортировка, возможна по нескольким полям
+    ordering = ('-views', 'title')
     # search_fields позволяет искать по полям
     search_fields = ('title', 'content')
     # actions позволяет выполнять действия над выбранными записями
     actions = [make_inactive, make_active]
+    # количество статей на страницу (пагинация)
     list_per_page = 10
 
     # # fields позволяет выбирать поля для редактирования (не работает с fieldsets)
