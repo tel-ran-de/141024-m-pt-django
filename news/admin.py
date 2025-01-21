@@ -9,18 +9,6 @@ admin.site.site_title = "Info to Go Admin Portal"
 admin.site.index_title = "Welcome to ITG Admin Portal"
 
 
-def make_inactive(modeladmin, request, queryset):
-    queryset.update(is_active=False)
-
-
-def make_active(modeladmin, request, queryset):
-    queryset.update(is_active=True)
-
-
-make_inactive.short_description = 'Сделать неактивными выбранные статьи'
-make_active.short_description = 'Сделать активными выбранные статьи'
-
-
 class TagInline(admin.TabularInline):
     model = Article.tags.through
     extra = 1
@@ -28,7 +16,7 @@ class TagInline(admin.TabularInline):
 
 class ArticleAdmin(admin.ModelAdmin):
     # list_display отображает поля в таблице
-    list_display = ('id', 'title', 'category', 'publication_date', 'views', 'colored_status')
+    list_display = ('id', 'title', 'category', 'views', 'is_active', 'status', 'has_spiders')
     # list_display_links позволяет указать в качестве ссылок другие поля
     list_display_links = ('id', 'title')
     # list_filter позволяет фильтровать по полям
@@ -38,7 +26,7 @@ class ArticleAdmin(admin.ModelAdmin):
     # search_fields позволяет искать по полям
     search_fields = ('title', 'content')
     # actions позволяет выполнять действия над выбранными записями
-    actions = [make_inactive, make_active]
+    actions = ['make_inactive', 'make_active', 'set_checked', 'set_unchecked']
     # количество статей на страницу (пагинация)
     list_per_page = 10
 
@@ -53,14 +41,30 @@ class ArticleAdmin(admin.ModelAdmin):
     # inlines позволяет добавлять дополнительные поля
     inlines = [TagInline]
 
-
     def get_queryset(self, request):
         return Article.all_objects.get_queryset()
 
-    def colored_status(self, obj):
-        return format_html('<span style="color: {};">{}</span>', 'green' if obj.is_active else 'red', obj.is_active)
+    @admin.display(description='Пауки внутри')
+    def has_spiders(self, article):
+        return 'Да' if 'пауки' in article.content else 'Нет'
 
-    colored_status.short_description = 'Статус'
+    @admin.action(description='Сделать неактивными выбранные статьи')
+    def make_inactive(modeladmin, request, queryset):
+        queryset.update(is_active=False)
+
+    @admin.action(description='Сделать активными выбранные статьи')
+    def make_active(modeladmin, request, queryset):
+        queryset.update(is_active=True)
+
+    @admin.action(description='Отметить статьи как проверенные')
+    def set_checked(self, request, queryset):
+        updated = queryset.update(status=Article.Status.CHECKED)
+        self.message_user(request, f'{updated} статей было отмечено как проверенные')
+
+    @admin.action(description='Отметить статьи как не проверенные')
+    def set_unchecked(self, request, queryset):
+        updated = queryset.update(status=Article.Status.UNCHECKED)
+        self.message_user(request, f'{updated} статей было отмечено как не проверенные', 'warning')
 
 
 admin.site.register(Article, ArticleAdmin)
