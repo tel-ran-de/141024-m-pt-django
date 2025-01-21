@@ -28,7 +28,9 @@ class TagInline(admin.TabularInline):
 
 class ArticleAdmin(admin.ModelAdmin):
     # list_display отображает поля в таблице
-    list_display = ('title', 'category', 'publication_date', 'views', 'colored_status')
+    list_display = ('id', 'title', 'category', 'publication_date', 'views', 'colored_status')
+    # list_display_links позволяет указать в качестве ссылок другие поля
+    list_display_links = ('id', 'title')
     # list_filter позволяет фильтровать по полям
     list_filter = ('category', 'is_active')
     # search_fields позволяет искать по полям
