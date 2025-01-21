@@ -42,6 +42,10 @@ class Tag(models.Model):
 
 
 class Article(models.Model):
+    class Status(models.IntegerChoices):
+        UNCHECKED = 0, 'не проверено'
+        CHECKED = 1, 'проверено'
+
     title = models.CharField(max_length=255, verbose_name='Заголовок')
     content = models.TextField(verbose_name='Содержание')
     publication_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
@@ -50,6 +54,9 @@ class Article(models.Model):
     tags = models.ManyToManyField('Tag', related_name='article', verbose_name='Теги')
     slug = models.SlugField(unique=True, blank=True, verbose_name='Слаг')
     is_active = models.BooleanField(default=True, verbose_name='Активна')
+    status = models.BooleanField(default=0,
+                                 choices=(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
+                                 verbose_name='Проверено')
 
     class Meta:
         db_table = 'Articles'  # без указания этого параметра, таблица в БД будет называться вида 'news_articles'
