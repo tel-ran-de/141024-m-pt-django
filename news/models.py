@@ -18,28 +18,43 @@ class AllArticleManager(models.Manager):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True, verbose_name='Категория')
+
+    class Meta:
+        db_table = 'Categories'  # без указания этого параметра, таблица в БД будет называться вида 'news_categorys'
+        verbose_name = 'Категория'  # единственное число для отображения в админке
+        verbose_name_plural = 'Категории'  # множественное число для отображения в админке
 
     def __str__(self):
         return self.name
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True,  verbose_name='Тег')
+
+    class Meta:
+        db_table = 'Tags'  # без указания этого параметра, таблица в БД будет называться вида 'news_tags'
+        verbose_name = 'Тег'  # единственное число для отображения в админке
+        verbose_name_plural = 'Теги'  # множественное число для отображения в админке
 
     def __str__(self):
         return self.name
 
 
 class Article(models.Model):
-    title = models.CharField(max_length=255)
-    content = models.TextField()
-    publication_date = models.DateTimeField(auto_now_add=True)
-    views = models.IntegerField(default=0)
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, default=1)
-    tags = models.ManyToManyField('Tag', related_name='article')
-    slug = models.SlugField(unique=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    title = models.CharField(max_length=255, verbose_name='Заголовок')
+    content = models.TextField(verbose_name='Содержание')
+    publication_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
+    views = models.IntegerField(default=0, verbose_name='Просмотры')
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, default=1, verbose_name='Категория')
+    tags = models.ManyToManyField('Tag', related_name='article', verbose_name='Теги')
+    slug = models.SlugField(unique=True, blank=True, verbose_name='Слаг')
+    is_active = models.BooleanField(default=True, verbose_name='Активна')
+
+    class Meta:
+        db_table = 'Articles'  # без указания этого параметра, таблица в БД будет называться вида 'news_articles'
+        verbose_name = 'Статья'  # единственное число для отображения в админке
+        verbose_name_plural = 'Статьи'  # множественное число для отображения в админке
 
     objects = ArticleManager()
     all_objects = AllArticleManager()

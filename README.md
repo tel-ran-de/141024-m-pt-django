@@ -3013,3 +3013,38 @@ class ArticleAdmin(admin.ModelAdmin):
 ```
 
 **commit: `Урок 14: добавили сортировки по полям в админ-панели`**
+
+### Перевод админ-панели
+
+#### models.py
+```python
+class Category(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    class Meta:
+        db_table = 'Categories'  # без указания этого параметра, таблица в БД будет называться вида 'news_categorys'
+        verbose_name = 'Категория'  # единственное число для отображения в админке
+        verbose_name_plural = 'Категории'  # множественное число для отображения в админке
+```
+
+#### models.py
+```python
+class Article(models.Model):
+    title = models.CharField(..., verbose_name='Заголовок')
+    content = models.TextField(..., verbose_name='Содержание')
+    publication_date = models.DateTimeField(...,  verbose_name='Дата публикации')
+    views = models.IntegerField(...,  verbose_name='Просмотры')
+    category = models.ForeignKey(...,  verbose_name='Категория')
+    tags = models.ManyToManyField(...,  verbose_name='Теги')
+    slug = models.SlugField(...,  verbose_name='Слаг')
+    is_active = models.BooleanField(...,  verbose_name='Активна')
+```
+
+#### apps.py
+```python
+class NewsConfig(AppConfig):
+    ...
+    verbose_name = 'Статья'
+    verbose_name_plural = 'Статьи'
+```
+
+**commit: `Урок 14: перевели админ-панель`**
