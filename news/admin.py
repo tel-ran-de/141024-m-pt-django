@@ -51,7 +51,10 @@ class ArticleAdmin(admin.ModelAdmin):
     list_per_page = 10
     # включение иерархического отображения по дате
     date_hierarchy = 'publication_date'
+    # редактирование полей из списка объектов
     list_editable = ('title', 'category', 'status')
+    # перенос кнопок сохранения в верхнюю часть формы
+    save_on_top = True
 
     # # fields позволяет выбирать поля для редактирования (не работает с fieldsets)
     # fields = ('title', 'category', 'content', 'tags', 'is_active')
