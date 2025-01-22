@@ -3158,3 +3158,21 @@ class ArticleAdmin(admin.ModelAdmin):
 ```
 
 **commit: `Урок 15: включили возможность сохранения объекта как нового`**
+
+### установка `django-jazzmin`
+
+```shell
+pip install django-jazzmin
+```
+
+### настройка `django-jazzmin`
+
+#### settings.py
+```python
+INSTALLED_APPS = [
+    'jazzmin',
+    ...
+]
+```
+
+**commit: `Урок 15: установили django-jazzmin`**
