@@ -3147,3 +3147,14 @@ class ArticleAdmin(admin.ModelAdmin):
 ```
 
 **commit: `Урок 15: перенесли кнопки сохранения в верхнюю часть формы`**
+
+### Включение возможности сохранения объекта как нового
+
+#### admin.py
+```python
+class ArticleAdmin(admin.ModelAdmin):
+    ...
+    save_as = True
+```
+
+**commit: `Урок 15: включили возможность сохранения объекта как нового`**

@@ -55,6 +55,9 @@ class ArticleAdmin(admin.ModelAdmin):
     list_editable = ('title', 'category', 'status')
     # перенос кнопок сохранения в верхнюю часть формы
     save_on_top = True
+    # поменять кнопку "Сохранить и добавить новый объект" на кнопку "Сохранить как новый объект"
+    save_as = True
+
 
     # # fields позволяет выбирать поля для редактирования (не работает с fieldsets)
     # fields = ('title', 'category', 'content', 'tags', 'is_active')
