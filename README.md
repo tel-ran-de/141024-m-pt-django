@@ -3114,3 +3114,14 @@ class ArticleAdmin(admin.ModelAdmin):
 ```
 
 **commit: `Урок 15: добавили иерархическое отображение по дате публикации`**
+
+### Добавление неизменяемых полей
+
+#### admin.py
+```python
+class ArticleAdmin(admin.ModelAdmin):
+    ...
+    readonly_fields = ('publication_date', 'views')
+```
+
+**commit: `Урок 15: пометили часть полей как неизменяемые`**
