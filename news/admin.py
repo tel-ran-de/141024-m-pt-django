@@ -33,6 +33,7 @@ class TagInline(admin.TabularInline):
     extra = 1
 
 
+@admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     # list_display отображает поля в таблице
     list_display = ('id', 'title', 'category', 'views', 'is_active', 'status', 'has_spiders')
@@ -86,6 +87,5 @@ class ArticleAdmin(admin.ModelAdmin):
         self.message_user(request, f'{updated} статей было отмечено как не проверенные', 'warning')
 
 
-admin.site.register(Article, ArticleAdmin)
 admin.site.register(Category)
 admin.site.register(Tag)
