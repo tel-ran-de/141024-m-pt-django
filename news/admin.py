@@ -38,7 +38,7 @@ class ArticleAdmin(admin.ModelAdmin):
     # list_display отображает поля в таблице
     list_display = ('id', 'title', 'category', 'views', 'is_active', 'status', 'has_spiders')
     # list_display_links позволяет указать в качестве ссылок другие поля
-    list_display_links = ('id', 'title')
+    list_display_links = ('id',)
     # list_filter позволяет фильтровать по полям
     list_filter = ('category', 'is_active', 'status', ArticleSpiderFilter)
     # сортировка, возможна по нескольким полям
@@ -51,6 +51,7 @@ class ArticleAdmin(admin.ModelAdmin):
     list_per_page = 10
     # включение иерархического отображения по дате
     date_hierarchy = 'publication_date'
+    list_editable = ('title', 'category', 'status')
 
     # # fields позволяет выбирать поля для редактирования (не работает с fieldsets)
     # fields = ('title', 'category', 'content', 'tags', 'is_active')
@@ -63,6 +64,8 @@ class ArticleAdmin(admin.ModelAdmin):
     )
     # inlines позволяет добавлять дополнительные поля
     inlines = [TagInline]
+    # readonly_fields включает поля только для чтения
+    # publication_date - может быть только для чтения, так как в модели данных стоит auto_now_add=True
     readonly_fields = ('views', 'publication_date', 'slug')
 
     def get_queryset(self, request):

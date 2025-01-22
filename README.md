@@ -3125,3 +3125,14 @@ class ArticleAdmin(admin.ModelAdmin):
 ```
 
 **commit: `Урок 15: пометили часть полей как неизменяемые`**
+
+### Добавление редактирования полей в общем списке объектов
+
+#### admin.py
+```python
+class ArticleAdmin(admin.ModelAdmin):
+    ...
+    list_editable = ('title', 'category')
+```
+
+**commit: `Урок 15: добавили возможность изменения заголовка из списка объектов`**
