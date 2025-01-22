@@ -138,3 +138,65 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Info to Go Admin",  # Заголовок административной панели
+    "site_header": "ITG: Admin",  # Заголовок окна браузера
+    "site_brand": "Info to Go",  # Бренд сайта
+    "welcome_sign": "Welcome to ITG: Admin",  # Приветственное сообщение
+    "copyright": "ITG GmbH",  # Информация о копирайте
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        # {"name": "Catalog", "url": "news:catalog", "new_window": True},
+        {"name": "Support", "url": "https://google.com", "new_window": True},
+    ],
+    "usermenu_links": [
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+        {"model": "auth.user"}
+    ],
+    "show_sidebar": True,  # Показать боковую панель
+    "navigation_expanded": True,  # Развернуть навигацию
+    "hide_apps": [],  # Скрыть приложения
+    "hide_models": [],  # Скрыть модели
+    "default_icon_parents": "fas fa-chevron-circle-right",  # Иконка для родительских элементов
+    "default_icon_children": "fas fa-circle",  # Иконка для дочерних элементов
+    "related_modal_active": False,  # Включить модальные окна для связанных объектов
+    "custom_css": None,  # Пользовательский CSS
+    "custom_js": None,  # Пользовательский JS
+    "use_google_fonts_cdn": True,  # Использовать Google Fonts CDN
+    "show_ui_builder": False,  # Показать конструктор интерфейса
+}
+
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": True,
+    "brand_small_text": False,
+    "brand_colour": "navbar-warning",
+    "accent": "accent-lime",
+    "navbar": "navbar-info navbar-dark",
+    "no_navbar_border": True,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-pink",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": True,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": True,
+    "theme": "cyborg",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}
