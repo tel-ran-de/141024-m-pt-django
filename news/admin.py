@@ -49,6 +49,8 @@ class ArticleAdmin(admin.ModelAdmin):
     actions = ['make_inactive', 'make_active', 'set_checked', 'set_unchecked']
     # количество статей на страницу (пагинация)
     list_per_page = 10
+    # включение иерархического отображения по дате
+    date_hierarchy = 'publication_date'
 
     # # fields позволяет выбирать поля для редактирования (не работает с fieldsets)
     # fields = ('title', 'category', 'content', 'tags', 'is_active')
