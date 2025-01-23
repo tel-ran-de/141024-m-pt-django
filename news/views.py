@@ -15,7 +15,7 @@ info = {
          "url_name": "about"},
         {"title": "Каталог",
          "url": "/news/catalog/",
-         "url_name": "catalog"},
+         "url_name": "news:catalog"},
     ],
 }
 
@@ -89,15 +89,7 @@ def get_all_news(request):
 
     articles = Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
 
-    context = {
-        'news': articles,
-        'news_count': len(articles),
-        'menu': [
-            {"title": "Главная", "url": "/", "url_name": "index"},
-            {"title": "О проекте", "url": "/about/", "url_name": "about"},
-            {"title": "Каталог", "url": "/news/catalog/", "url_name": "catalog"},
-        ],
-    }
+    context = {**info, 'news': articles, 'news_count': len(articles),}
 
     return render(request, 'news/catalog.html', context=context)
 
@@ -108,26 +100,15 @@ def get_detail_article_by_id(request, article_id):
     """
     article = get_object_or_404(Article, pk=article_id)
 
-    context = {
-        'article': article,
-        'menu': [
-            {"title": "Главная", "url": "/", "url_name": "index"},
-            {"title": "О проекте", "url": "/about/", "url_name": "about"},
-            {"title": "Каталог", "url": "/news/catalog/", "url_name": "catalog"},
-        ],
-    }
+    context = {**info, 'article': article}
+
     return render(request, 'news/article_detail.html', context=context)
 
 
 def get_detail_article_by_title(request, title):
 
     article = get_object_or_404(Article, slug=title)
-    context = {
-        'article': article,
-        'menu': [
-            {"title": "Главная", "url": "/", "url_name": "index"},
-            {"title": "О проекте", "url": "/about/", "url_name": "about"},
-            {"title": "Каталог", "url": "/news/catalog/", "url_name": "catalog"},
-        ],
-    }
+
+    context = {**info, 'article': article}
+
     return render(request, 'news/article_detail.html', context=context)

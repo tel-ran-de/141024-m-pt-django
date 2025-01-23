@@ -10,7 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main, name='index'),
     path('about/', views.about, name='about'),
-    path('news/', include('news.urls')),
+    path('news/', include('news.urls', namespace='news')),
 ]
 
 if settings.DEBUG:
