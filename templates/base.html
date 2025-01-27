@@ -53,8 +53,29 @@
         </nav>
     </header>
     <main class="container mt-5">
-        {% block content %}
-        {% endblock %}
+        <div class="row">
+            <div class="col-md-9">
+                {% block content %}
+                {% endblock %}
+            </div>
+            {% if request.resolver_match.app_name == 'news' %}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Рубрикатор</h5>
+                        <ul class="list-group">
+                            {% for category in categories %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'news:get_news_by_category' category.id %}">{{ category.name }}</a>
+                                    <span class="badge bg-primary rounded-pill">{{ category.article_set.count }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
     </main>
     <footer class="footer mt-5">
         {% block footer %}

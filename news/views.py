@@ -6,6 +6,7 @@ from .models import Article, Category, Tag
 info = {
     "users_count": 5,
     "news_count": 10,
+    "categories": Category.objects.all(),
     "menu": [
         {"title": "Главная",
          "url": "/",
