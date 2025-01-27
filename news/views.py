@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .models import Article, Tag
+from .models import Article, Category, Tag
 
 
 info = {
@@ -43,11 +43,11 @@ def get_categories(request):
     return HttpResponse('All categories')
 
 
-def get_news_by_category(request, slug):
-    """
-    Возвращает новости по категории для представления в каталоге
-    """
-    return HttpResponse(f'News by category {slug}')
+def get_news_by_category(request, category_id):
+    category = get_object_or_404(Category, pk=category_id)
+    articles = Article.objects.filter(category=category)
+    context = {**info, 'news': articles, 'news_count': len(articles)}
+    return render(request, 'news/catalog.html', context=context)
 
 
 def get_news_by_tag(request, tag_id):

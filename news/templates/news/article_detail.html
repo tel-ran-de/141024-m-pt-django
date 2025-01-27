@@ -5,7 +5,7 @@
         <div class="card-body">
             <h5 class="card-title">{% upper_words article.title %}</h5>
             <p class="card-text">{{ article.content }}</p>
-            <p class="card-text">{{ article.category }}</p>
+            <p class="card-text"><a href="{% url 'news:get_news_by_category' article.category.id %}">{{ article.category }}</a></p>
             {% for tag in article.tags.all %}
                 <a href="{% url 'news:get_news_by_tag' tag.id %}" class="badge bg-info text-decoration-none">{{ tag }}</a>
             {% endfor %}
