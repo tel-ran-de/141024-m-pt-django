@@ -7,7 +7,7 @@
             <p class="card-text">{{ article.content }}</p>
             <p class="card-text">{{ article.category }}</p>
             {% for tag in article.tags.all %}
-                <span class="badge bg-info">{{ tag }}</span>
+                <a href="{% url 'news:get_news_by_tag' tag.id %}" class="badge bg-info text-decoration-none">{{ tag }}</a>
             {% endfor %}
             <p class="card-text">{{ article.id_author }}</p>
             <p class="card-text">{{ article.publication_date }}</p>
