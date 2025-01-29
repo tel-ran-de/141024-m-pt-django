@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from django.db.models import F, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Article, Category, Like, Tag
+from .models import Article, Favorite, Category, Like, Tag
 
 
 info = {
@@ -19,9 +19,27 @@ info = {
         {"title": "Каталог",
          "url": "/news/catalog/",
          "url_name": "news:catalog"},
+        {"title": "Избранное",
+         "url": "/news/favorites/",
+         "url_name": "news:favorites"},
     ],
 }
 
+
+def favorites(request):
+    ip_address = request.META.get('REMOTE_ADDR')
+    favorite_articles = Article.objects.filter(favorites__ip_address=ip_address)
+    context = {**info, 'news': favorite_articles, 'news_count': len(favorite_articles), 'page_obj': favorite_articles, 'user_ip': request.META.get('REMOTE_ADDR'), }
+    return render(request, 'news/catalog.html', context=context)
+
+
+def toggle_favorite(request, article_id):
+    article = get_object_or_404(Article, pk=article_id)
+    ip_address = request.META.get('REMOTE_ADDR')
+    favorite, created = Favorite.objects.get_or_create(article=article, ip_address=ip_address)
+    if not created:
+        favorite.delete()
+    return redirect('news:detail_article_by_id', article_id=article_id)
 
 def toggle_like(request, article_id):
     article = get_object_or_404(Article, pk=article_id)

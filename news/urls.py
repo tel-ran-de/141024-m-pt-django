@@ -12,4 +12,6 @@ urlpatterns = [
     path('category/<int:category_id>/', views.get_news_by_category, name='get_news_by_category'),
     path('search/', views.search_news, name='search_news'),
     path('like/<int:article_id>/', views.toggle_like, name='toggle_like'),
+    path('favorite/<int:article_id>/', views.toggle_favorite, name='toggle_favorite'),
+    path('favorites/', views.favorites, name='favorites'),
 ]

@@ -90,3 +90,11 @@ class Like(models.Model):
 
     def __str__(self):
         return f'Like by {self.ip_address} on {self.article}'
+
+
+class Favorite(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='favorites')
+    ip_address = models.GenericIPAddressField()
+
+    def __str__(self):
+        return f'Favorite by {self.ip_address} on {self.article}'
