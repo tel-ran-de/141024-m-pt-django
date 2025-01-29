@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load upper_words %}
+{% load customtags %}
 {% block content %}
     <div class="card">
         <div class="card-body">
@@ -12,7 +13,17 @@
             <p class="card-text">{{ article.id_author }}</p>
             <p class="card-text"><small class="text-muted"><i class="bi bi-calendar"></i> {{ article.publication_date }}</small></p>
             <p class="card-text"><i class="bi bi-eye-fill"></i> {{ article.views }}</p>
-            <p class="card-text">{{ article.favorites_count }}</p>
+            <p class="card-text"><i class="bi bi-heart-fill"></i> {{ article.likes.count }}</p>
+            <form method="POST" action="{% url 'news:toggle_like' article.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    {% if article|has_liked:user_ip %}
+                        Убрать лайк
+                    {% else %}
+                        Лайк
+                    {% endif %}
+                </button>
+            </form>
         </div>
     </div>
 {% endblock %}
