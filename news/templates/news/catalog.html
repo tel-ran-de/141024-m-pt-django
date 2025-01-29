@@ -10,10 +10,10 @@
     <p class="text-center">Всего новостей: {{ news_count }}</p>
     <p class="text-center">Всего пользователей: {{ users_count }}</p>
     <div class="row">
-        {% for article in news %}
-            <div class="col-md-6 mb-4">
-                {% include "include/article_preview.html" with article=article %}
-            </div>
+        {% include "include/paginator.html" with page=page_obj %}
+        {% for article in page_obj %}
+            {% include "include/article_preview.html" with article=article %}
         {% endfor %}
+        {% include "include/paginator.html" with page=page_obj %}
     </div>
 {% endblock %}
