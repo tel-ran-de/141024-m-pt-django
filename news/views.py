@@ -158,8 +158,15 @@ def get_detail_article_by_id(request, article_id):
     Возвращает детальную информацию по новости для представления
     """
     article = get_object_or_404(Article, pk=article_id)
-    Article.objects.filter(pk=article_id).update(views=F('views') + 1)
-    article.refresh_from_db()  # Обновить объект article из базы данных
+
+    # Увеличиваем счетчик просмотров только один раз за сессию для каждой новости
+    viewed_articles = request.session.get('viewed_articles', [])
+    if article_id not in viewed_articles:
+        article.views += 1
+        article.save()
+        viewed_articles.append(article_id)
+        request.session['viewed_articles'] = viewed_articles
+
     context = {**info, 'article': article}
 
     return render(request, 'news/article_detail.html', context=context)

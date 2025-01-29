@@ -7,29 +7,28 @@
             <p class="card-text">{{ article.content }}</p>
             <p class="card-text"><a href="{% url 'news:get_news_by_category' article.category.id %}" class="text-decoration-none text-primary fw-bold">{{ article.category }}</a></p>
             {% for tag in article.tags.all %}
-                <a href="{% url 'news:get_news_by_tag' tag.id %}" class="badge bg-info text-decoration-none">{{ tag }}</a>
+                <a href="{% url 'news:get_news_by_tag' tag.id %}" class="text-decoration-none" style="color: {{ tag|random_color }};"><i class="bi bi-hash"></i>{{ tag.name|upper }}</a>
             {% endfor %}
             <p class="card-text">{{ article.id_author }}</p>
             <p class="card-text"><small class="text-muted"><i class="bi bi-calendar"></i> {{ article.publication_date }}</small></p>
             <p class="card-text"><i class="bi bi-eye-fill"></i> {{ article.views }}</p>
-            <p class="card-text"><i class="bi bi-heart-fill"></i> {{ article.likes.count }}</p>
             <form method="POST" action="{% url 'news:toggle_like' article.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-link p-0 text-black text-decoration-none">
                     {% if article|has_liked:user_ip %}
-                        Убрать лайк
+                        <p class="card-text"><i class="bi bi-balloon-heart-fill"></i> {{ article.likes.count }}</p>
                     {% else %}
-                        Лайк
+                        <p class="card-text"><i class="bi bi-balloon-heart"></i> {{ article.likes.count }}</p>
                     {% endif %}
                 </button>
             </form>
             <form method="POST" action="{% url 'news:toggle_favorite' article.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-link p-0 text-black text-decoration-none">
                     {% if article|has_favorited:user_ip %}
-                        Убрать из избранного
+                        <i class="bi bi-star-fill"></i>
                     {% else %}
-                        Добавить в избранное
+                        <i class="bi bi-star"></i>
                     {% endif %}
                 </button>
             </form>
