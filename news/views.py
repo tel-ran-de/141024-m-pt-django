@@ -1,7 +1,9 @@
 from django.core.paginator import Paginator
 from django.db.models import F, Q
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import ArticleForm
 from .models import Article, Favorite, Category, Like, Tag
 
 
@@ -179,3 +181,17 @@ def get_detail_article_by_title(request, title):
     context = {**info, 'article': article, 'user_ip': request.META.get('REMOTE_ADDR'),}
 
     return render(request, 'news/article_detail.html', context=context)
+
+
+def add_article(request):
+    if request.method == "POST":
+        form = ArticleForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect('/')
+    else:
+        form = ArticleForm()
+    context = {
+        'form': form,
+        'menu': info['menu']
+    }
+    return render(request, 'news/add_article.html', context=context)

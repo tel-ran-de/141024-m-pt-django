@@ -14,4 +14,5 @@ urlpatterns = [
     path('like/<int:article_id>/', views.toggle_like, name='toggle_like'),
     path('favorite/<int:article_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('favorites/', views.favorites, name='favorites'),
+    path('add/', views.add_article, name='add_article'),
 ]
