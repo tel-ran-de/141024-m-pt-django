@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import F, Q
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Article, Category, Tag
@@ -112,7 +112,8 @@ def get_detail_article_by_id(request, article_id):
     Возвращает детальную информацию по новости для представления
     """
     article = get_object_or_404(Article, pk=article_id)
-
+    Article.objects.filter(pk=article_id).update(views=F('views') + 1)
+    article.refresh_from_db()  # Обновить объект article из базы данных
     context = {**info, 'article': article}
 
     return render(request, 'news/article_detail.html', context=context)

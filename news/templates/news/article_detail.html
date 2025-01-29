@@ -5,13 +5,13 @@
         <div class="card-body">
             <h5 class="card-title">{% upper_words article.title %}</h5>
             <p class="card-text">{{ article.content }}</p>
-            <p class="card-text"><a href="{% url 'news:get_news_by_category' article.category.id %}">{{ article.category }}</a></p>
+            <p class="card-text"><a href="{% url 'news:get_news_by_category' article.category.id %}" class="text-decoration-none text-primary fw-bold">{{ article.category }}</a></p>
             {% for tag in article.tags.all %}
                 <a href="{% url 'news:get_news_by_tag' tag.id %}" class="badge bg-info text-decoration-none">{{ tag }}</a>
             {% endfor %}
             <p class="card-text">{{ article.id_author }}</p>
-            <p class="card-text">{{ article.publication_date }}</p>
-            <p class="card-text">{{ article.views }}</p>
+            <p class="card-text"><small class="text-muted"><i class="bi bi-calendar"></i> {{ article.publication_date }}</small></p>
+            <p class="card-text"><i class="bi bi-eye-fill"></i> {{ article.views }}</p>
             <p class="card-text">{{ article.favorites_count }}</p>
         </div>
     </div>
