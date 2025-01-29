@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Article, Category, Tag
@@ -19,6 +20,17 @@ info = {
          "url_name": "news:catalog"},
     ],
 }
+
+
+def search_news(request):
+    query = request.GET.get('q')
+    categories = Category.objects.all()
+    if query:
+        articles = Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
+    else:
+        articles = Article.objects.all()
+    context = {**info, 'news': articles, 'news_count': len(articles)}
+    return render(request, 'news/catalog.html', context=context)
 
 
 def main(request):

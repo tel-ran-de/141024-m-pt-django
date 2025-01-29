@@ -52,6 +52,10 @@
             </div>
         </nav>
     </header>
+    <form method="GET" action="{% url 'news:search_news' %}" class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Search" name="q">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Поиск</button>
+    </form>
     <main class="container mt-5">
         <div class="row">
             <div class="col-md-9">
