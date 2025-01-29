@@ -1,16 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Предложить новость</h1>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <p>
-                {{ field.label_tag }} {{ field }}
-                {% if field.errors %}
-                    <div class="error">{{ field.errors }}</div>
-                {% endif %}
-            </p>
-        {% endfor %}
-        <input type="submit" value="Отправить">
-    </form>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Колонка для формы редактирования -->
+            <div class="col-12 col-lg-6">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="alert alert-danger mt-1">{{ field.errors.as_text }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="mb-3">
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-dark">Отправить</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <h2>Подсказка</h2>
+            <p>Для добавления новости заполните форму и нажмите кнопку "Отправить".</p>
+            <p>Поля формы:</p>
+            <ul>
+                <li><strong>Заголовок</strong> - заголовок новости</li>
+                <li><strong>Содержание</strong> - описание новости</li>
+                <li><strong>Ссылка</strong> - ссылка на новость</li>
+                <li><strong>Изображение</strong> - изображение новость</li>
+            </ul>
+            <p>После отправки формы новость будет добавлена на главную страницу.</p>
+        </div>
+    </div>
 {% endblock %}

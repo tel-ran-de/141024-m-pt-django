@@ -187,7 +187,15 @@ def add_article(request):
     if request.method == "POST":
         form = ArticleForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect('/')
+            title = form.cleaned_data['title']
+            content = form.cleaned_data['content']
+            category = form.cleaned_data['category']
+            # сохраняем статью в базе данных
+            article = Article(title=title, content=content, category=category)
+            article.save()
+            # получаем id сохраненной статьи
+            article_id = article.id
+            return HttpResponseRedirect(f'/news/catalog/{article_id}')
     else:
         form = ArticleForm()
     context = {
