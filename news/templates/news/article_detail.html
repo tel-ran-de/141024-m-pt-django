@@ -1,37 +1,40 @@
 {% extends "base.html" %}
 {% load customtags %}
 {% block content %}
-    <div class="card">
+    {% include "include/search_form.html" %}
+    <div class="card card-shadow">
         <div class="card-body">
             <h5 class="card-title">{{ article.title }}</h5>
             <p class="card-text">{{ article.content }}</p>
-            <p class="card-text"><a href="{% url 'news:get_news_by_category' article.category.id %}" class="text-decoration-none text-primary fw-bold">{{ article.category }}</a></p>
+            <p class="card-text"><a href="{% url 'news:get_news_by_category' article.category.id %}" class="text-decoration-none text-primary fw-bold category-link">{{ article.category }}</a></p>
             {% for tag in article.tags.all %}
                 <a href="{% url 'news:get_news_by_tag' tag.id %}" class="text-decoration-none" style="color: {{ tag|random_color }};"><i class="bi bi-hash"></i>{{ tag.name|upper }}</a>
             {% endfor %}
             <p class="card-text">{{ article.id_author }}</p>
-            <p class="card-text"><small class="text-muted"><i class="bi bi-calendar"></i> {{ article.publication_date }}</small></p>
-            <p class="card-text"><i class="bi bi-eye-fill"></i> {{ article.views }}</p>
-            <form method="POST" action="{% url 'news:toggle_like' article.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-link p-0 text-black text-decoration-none">
-                    {% if article|has_liked:user_ip %}
-                        <p class="card-text"><i class="bi bi-balloon-heart-fill"></i> {{ article.likes.count }}</p>
-                    {% else %}
-                        <p class="card-text"><i class="bi bi-balloon-heart"></i> {{ article.likes.count }}</p>
-                    {% endif %}
-                </button>
-            </form>
-            <form method="POST" action="{% url 'news:toggle_favorite' article.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-link p-0 text-black text-decoration-none">
-                    {% if article|has_favorited:user_ip %}
-                        <i class="bi bi-star-fill"></i>
-                    {% else %}
-                        <i class="bi bi-star"></i>
-                    {% endif %}
-                </button>
-            </form>
+            <p class="card-text d-flex justify-content-between">
+                <small class="text-muted"><i class="bi bi-calendar"></i> {{ article.publication_date }}</small>
+                <span><i class="bi bi-eye-fill"></i> {{ article.views }}</span>
+                <form method="POST" action="{% url 'news:toggle_like' article.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link p-0 text-black text-decoration-none">
+                        {% if article|has_liked:user_ip %}
+                            <i class="bi bi-balloon-heart-fill"></i> {{ article.likes.count }}
+                        {% else %}
+                            <i class="bi bi-balloon-heart"></i> {{ article.likes.count }}
+                        {% endif %}
+                    </button>
+                </form>
+                <form method="POST" action="{% url 'news:toggle_favorite' article.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link p-0 text-black text-decoration-none">
+                        {% if article|has_favorited:user_ip %}
+                            <i class="bi bi-star-fill"></i>
+                        {% else %}
+                            <i class="bi bi-star"></i>
+                        {% endif %}
+                    </button>
+                </form>
+            </p>
         </div>
     </div>
 {% endblock %}

@@ -1,19 +1,15 @@
 {% extends 'base.html' %}
-
-{% comment %} Этот шаблон расширяет базовый шаблон base.html {% endcomment %}
-{% comment %} news/templates/news/catalog.html {% endcomment %}
-
 {% block title %}Каталог новостей Info to Go{% endblock %}
-
 {% block content %}
-    <h1 class="text-center mb-4">Каталог новостей Info to Go</h1>
-    <p class="text-center">Всего новостей: {{ news_count }}</p>
-    <p class="text-center">Всего пользователей: {{ users_count }}</p>
+    {% include "include/search_form.html" %}
+    <h1 class="text-center mb-4"></h1>
     <div class="row">
         {% include "include/paginator.html" with page=page_obj %}
+
         {% for article in page_obj %}
             {% include "include/article_preview.html" with article=article %}
         {% endfor %}
+
         {% include "include/paginator.html" with page=page_obj %}
     </div>
 {% endblock %}

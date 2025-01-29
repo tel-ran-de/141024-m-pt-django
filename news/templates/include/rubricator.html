@@ -1,0 +1,14 @@
+<div class="card border-0 bg-transparent">
+    <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+            {% for category in categories %}
+                {% if category.article_set.count > 0 %}
+                    <a href="{% url 'news:get_news_by_category' category.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-transparent text-light hover-effect">
+                        {{ category.name }}
+                        <span class="badge bg-primary rounded-pill">{{ category.article_set.count }}</span>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>

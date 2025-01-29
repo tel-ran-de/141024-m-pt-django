@@ -1,15 +1,6 @@
 {% extends "base.html" %}
-
-{% comment %}
-    Этот шаблон расширяет базовый шаблон base.html
-{% endcomment %}
-
 {% block content %}
     <h1 class="text-center mb-4">Главная страница</h1>
     <p class="text-center">Добро пожаловать на сайт!</p>
     <p class="text-center">На нашем сайте, новостей {{ news_count }}, пользователей {{ users_count }}.</p>
-{% endblock %}
-
-{% block footer %}
-    <p>Это footer</p>
 {% endblock %}
