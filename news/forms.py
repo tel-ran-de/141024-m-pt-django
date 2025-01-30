@@ -12,10 +12,11 @@ class ArticleForm(forms.ModelForm):
 
     class Meta:
         model = Article
-        fields = ['title', 'content', 'category', 'tags']
+        fields = ['title', 'content', 'category', 'tags', 'image']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
-            'publication_date': forms.DateInput(attrs={'type': 'date'})
+            'publication_date': forms.DateInput(attrs={'type': 'date'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control-file'})
         }
         labels = {
             'category': 'Категория',
