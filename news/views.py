@@ -193,3 +193,28 @@ def add_article(request):
         form = ArticleForm()
     context = {'form': form, 'menu': info['menu']}
     return render(request, 'news/add_article.html', context=context)
+
+
+def article_update(request, article_id):
+    article = get_object_or_404(Article, pk=article_id)
+
+    if request.method == "POST":
+        form = ArticleForm(request.POST, request.FILES, instance=article)
+        if form.is_valid():
+            form.save()
+            return redirect('news:detail_article_by_id', article_id=article.id)
+    else:
+        form = ArticleForm(instance=article)
+    context = {'form': form, 'menu': info['menu'], 'article': article}
+    return render(request, 'news/edit_article.html', context=context)
+
+
+def article_delete(request, article_id):
+    article = get_object_or_404(Article, pk=article_id)
+
+    if request.method == "POST":
+        article.delete()
+        return redirect('news:catalog')
+
+    context = {'menu': info['menu'], 'article': article}
+    return render(request, 'news/delete_article.html', context=context)
