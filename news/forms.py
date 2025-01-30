@@ -1,24 +1,23 @@
 from django import forms
 
-from .models import Category
+from .models import Article, Category, Tag
 
 
-class ArticleForm(forms.Form):
-    title = forms.CharField(
-        label='Заголовок',
-        max_length=255,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+class ArticleForm(forms.ModelForm):
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
     )
-    content = forms.CharField(
-        label='Содержание',
-        widget=forms.Textarea(attrs={'class': 'form-control',
-                                     'rows': 5,
-                                     'cols': 40})
-    )
-    category = forms.ModelChoiceField(
-        label='Категория',
-        queryset=Category.objects.all(),
-        required=True,
-        empty_label='Выберите категорию',
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
+
+    class Meta:
+        model = Article
+        fields = ['title', 'content', 'category', 'tags']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
+            'publication_date': forms.DateInput(attrs={'type': 'date'})
+        }
+        labels = {
+            'category': 'Категория',
+            'tags': 'Теги',
+        }
