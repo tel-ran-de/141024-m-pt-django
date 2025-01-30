@@ -37,4 +37,14 @@
             </p>
         </div>
     </div>
+    <div class="mt-4 border-top pt-3">
+        <a href="{% url 'news:article_update' article.id %}"
+           class="btn btn-warning">
+           <i class="bi bi-pencil-square"></i> Редактировать
+        </a>
+        <a href="{% url 'news:article_delete' article.id %}"
+           class="btn btn-danger">
+           <i class="bi bi-trash"></i> Удалить
+        </a>
+    </div>
 {% endblock %}
