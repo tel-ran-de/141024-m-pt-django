@@ -57,6 +57,12 @@ class Article(models.Model):
     status = models.BooleanField(default=0,
                                  choices=(map(lambda x: (bool(x[0]), x[1]), Status.choices)),
                                  verbose_name='Проверено')
+    image = models.ImageField(
+        upload_to='articles/',
+        blank=True,
+        null=True,
+        verbose_name='Изображение'
+    )
 
     class Meta:
         db_table = 'Articles'  # без указания этого параметра, таблица в БД будет называться вида 'news_articles'
