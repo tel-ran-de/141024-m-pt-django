@@ -36,7 +36,7 @@ info = {
 }
 
 
-def upload_json(request):
+def upload_json_view(request):
     if request.method == 'POST':
         form = ArticleUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -45,43 +45,85 @@ def upload_json(request):
                 data = json.load(json_file)
                 errors = form.validate_json_data(data)
                 if errors:
-                    return render(request, 'news/add_article.html', {'form': form, 'errors': errors})
-                for item in data:
-                    fields = item['fields']
-                    title = fields['title']
-                    content = fields['content']
-                    category_name = fields['category']
-                    tags_names = fields['tags']
-                    category = Category.objects.get(name=category_name)
+                    return render(request, 'news/upload_json.html', {'form': form, 'errors': errors})
 
-                    # Генерируем slug до создания статьи
-                    base_slug = slugify(unidecode.unidecode(title))
-                    unique_slug = base_slug
-                    num = 1
-                    while Article.objects.filter(slug=unique_slug).exists():
-                        unique_slug = f"{base_slug}-{num}"
-                        num += 1
-
-                    # Создаем новую статью с уникальным slug
-                    article = Article(
-                        title=title,
-                        content=content,
-                        category=category,
-                        slug=unique_slug
-                    )
-                    article.save()
-
-                    # Добавляем теги к статье
-                    for tag_name in tags_names:
-                        tag = Tag.objects.get(name=tag_name)
-                        article.tags.add(tag)
-
-                return redirect('news:catalog')
+                # Сохраняем данные в сессию для последовательного просмотра
+                request.session['articles_data'] = data
+                request.session['current_index'] = 0
+                return redirect('news:edit_article_from_json', index=0)
             except json.JSONDecodeError:
                 return render(request, 'news/upload_json.html', {'form': form, 'error': 'Неверный формат JSON-файла'})
     else:
         form = ArticleUploadForm()
     return render(request, 'news/upload_json.html', {'form': form})
+
+
+def edit_article_from_json(request, index):
+    articles_data = request.session.get('articles_data', [])
+    if index >= len(articles_data):
+        return redirect('news:catalog')
+    article_data = articles_data[index]
+    form = ArticleForm(initial={
+        'title': article_data['fields']['title'],
+        'content': article_data['fields']['content'],
+        'category': Category.objects.get(name=article_data['fields']['category']),
+        'tags': [Tag.objects.get(name=tag) for tag in article_data['fields']['tags']]
+    })
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, request.FILES)
+        if form.is_valid():
+            if 'next' in request.POST:
+                # Сохраняем текущую статью
+                save_article(article_data, form)
+                # Переходим к следующей статье
+                request.session['current_index'] = index + 1
+                return redirect('news:edit_article_from_json', index=index + 1)
+            elif 'save_all' in request.POST:
+                # Сохраняем текущую статью
+                save_article(article_data, form)
+                # Сохраняем все оставшиеся статьи
+                for i in range(index + 1, len(articles_data)):
+                    save_article(articles_data[i])
+                del request.session['articles_data']
+                del request.session['current_index']
+                return redirect('news:catalog')
+    context = {'form': form, 'index': index, 'total': len(articles_data), 'is_last': index == len(articles_data) - 1}
+    return render(request, 'news/edit_article_from_json.html', context)
+
+
+def save_article(article_data, form=None):
+    fields = article_data['fields']
+    title = fields['title']
+    content = fields['content']
+    category_name = fields['category']
+    tags_names = fields['tags']
+    category = Category.objects.get(name=category_name)
+    # Генерируем slug до создания статьи
+    base_slug = slugify(unidecode.unidecode(title))
+    unique_slug = base_slug
+    num = 1
+    while Article.objects.filter(slug=unique_slug).exists():
+        unique_slug = f"{base_slug}-{num}"
+        num += 1
+    if form:
+        article = form.save(commit=False)
+        article.slug = unique_slug
+        article.save()
+        # Обновляем теги
+        article.tags.set(form.cleaned_data['tags'])
+    else:
+        article = Article(
+            title=title,
+            content=content,
+            category=category,
+            slug=unique_slug
+        )
+        article.save()
+        # Добавляем теги к статье
+        for tag_name in tags_names:
+            tag = Tag.objects.get(name=tag_name)
+            article.tags.add(tag)
+    return article
 
 
 def favorites(request):
@@ -244,8 +286,15 @@ def add_article(request):
     if request.method == "POST":
         form = ArticleForm(request.POST, request.FILES)
         if form.is_valid():
-            article = form.save(commit=False)
-            article.save()  # Сохраняем статью, чтобы сгенерировать slug
+            article_data = {
+                'fields': {
+                    'title': form.cleaned_data['title'],
+                    'content': form.cleaned_data['content'],
+                    'category': form.cleaned_data['category'].name,
+                    'tags': [tag.name for tag in form.cleaned_data['tags']]
+                }
+            }
+            article = save_article(article_data, form)
             return redirect('news:detail_article_by_id', article_id=article.id)
     else:
         form = ArticleForm()

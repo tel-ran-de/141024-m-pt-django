@@ -29,3 +29,8 @@ def random_color(tag):
 @register.filter
 def basename(value):
     return os.path.basename(value)
+
+
+@register.filter
+def add(value, arg):
+    return int(value) + int(arg)
