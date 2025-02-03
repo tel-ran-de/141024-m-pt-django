@@ -78,10 +78,10 @@ def upload_json(request):
 
                 return redirect('news:catalog')
             except json.JSONDecodeError:
-                return render(request, 'news/add_article.html', {'form': form, 'error': 'Неверный формат JSON-файла'})
+                return render(request, 'news/upload_json.html', {'form': form, 'error': 'Неверный формат JSON-файла'})
     else:
         form = ArticleUploadForm()
-    return render(request, 'news/add_article.html', {'form': form})
+    return render(request, 'news/upload_json.html', {'form': form})
 
 
 def favorites(request):
@@ -244,7 +244,8 @@ def add_article(request):
     if request.method == "POST":
         form = ArticleForm(request.POST, request.FILES)
         if form.is_valid():
-            article = form.save()
+            article = form.save(commit=False)
+            article.save()  # Сохраняем статью, чтобы сгенерировать slug
             return redirect('news:detail_article_by_id', article_id=article.id)
     else:
         form = ArticleForm()
