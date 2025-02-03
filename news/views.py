@@ -1,16 +1,15 @@
 import json
 
 from django.core.paginator import Paginator
+from django.db import models
 from django.db.models import F, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
-
-from .forms import ArticleForm
-from .models import Article, Favorite, Category, Like, Tag
-
-import unidecode
-from django.db import models
 from django.utils.text import slugify
+import unidecode
+
+from .forms import ArticleForm, ArticleUploadForm
+from .models import Article, Favorite, Category, Like, Tag
 
 
 info = {
@@ -38,40 +37,51 @@ info = {
 
 
 def upload_json(request):
-    if request.method == 'POST' and request.FILES['json_file']:
-        json_file = request.FILES['json_file']
-        try:
-            data = json.load(json_file)
-            for item in data:
-                fields = item['fields']
-                title = fields['title']
-                content = fields['content']
-                category_name = fields['category']
-                tags_names = fields['tags']
-                category, created = Category.objects.get_or_create(name=category_name)
-                # Генерируем slug до создания статьи
-                base_slug = slugify(unidecode.unidecode(title))
-                unique_slug = base_slug
-                num = 1
-                while Article.objects.filter(slug=unique_slug).exists():
-                    unique_slug = f"{base_slug}-{num}"
-                    num += 1
-                # Создаем новую статью с уникальным slug
-                article = Article(
-                    title=title,
-                    content=content,
-                    category=category,
-                    slug=unique_slug
-                )
-                article.save()
-                # Добавляем теги к статье
-                for tag_name in tags_names:
-                    tag, created = Tag.objects.get_or_create(name=tag_name)
-                    article.tags.add(tag)
-            return redirect('news:catalog')
-        except json.JSONDecodeError:
-            return render(request, 'news/add_article.html', {'error': 'Неверный формат JSON-файла'})
-    return render(request, 'news/add_article.html')
+    if request.method == 'POST':
+        form = ArticleUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            json_file = form.cleaned_data['json_file']
+            try:
+                data = json.load(json_file)
+                errors = form.validate_json_data(data)
+                if errors:
+                    return render(request, 'news/add_article.html', {'form': form, 'errors': errors})
+                for item in data:
+                    fields = item['fields']
+                    title = fields['title']
+                    content = fields['content']
+                    category_name = fields['category']
+                    tags_names = fields['tags']
+                    category = Category.objects.get(name=category_name)
+
+                    # Генерируем slug до создания статьи
+                    base_slug = slugify(unidecode.unidecode(title))
+                    unique_slug = base_slug
+                    num = 1
+                    while Article.objects.filter(slug=unique_slug).exists():
+                        unique_slug = f"{base_slug}-{num}"
+                        num += 1
+
+                    # Создаем новую статью с уникальным slug
+                    article = Article(
+                        title=title,
+                        content=content,
+                        category=category,
+                        slug=unique_slug
+                    )
+                    article.save()
+
+                    # Добавляем теги к статье
+                    for tag_name in tags_names:
+                        tag = Tag.objects.get(name=tag_name)
+                        article.tags.add(tag)
+
+                return redirect('news:catalog')
+            except json.JSONDecodeError:
+                return render(request, 'news/add_article.html', {'form': form, 'error': 'Неверный формат JSON-файла'})
+    else:
+        form = ArticleUploadForm()
+    return render(request, 'news/add_article.html', {'form': form})
 
 
 def favorites(request):
