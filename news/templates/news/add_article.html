@@ -13,24 +13,32 @@
         </div>
     {% endif %}
 
+    <!-- Форма для загрузки JSON-файла -->
+    <form method="post" enctype="multipart/form-data" action="{% url 'news:upload_json' %}" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="{{ form.json_file.id_for_label }}" class="form-label fw-bold">Потоковая загрузка:</label>
+            {{ form.json_file }}
+        </div>
+        <button type="submit" class="btn btn-success mb-4">
+            <i class="bi bi-upload"></i> Загрузить новости
+        </button>
+    </form>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+
         <!-- Поле для изображения -->
-        <div class="form-group mb-4">
-            <label class="form-label fw-bold">Обложка статьи:</label>
-            <div class="custom-file">
-                {{ form.image }}
-                <label class="custom-file-label" for="{{ form.image.id_for_label }}">
-                    Выберите файл (JPEG, PNG)
-                </label>
-            </div>
+        <div class="mb-3">
+            <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">Обложка статьи:</label>
+            {{ form.image }}
             <small class="form-text text-muted">
                 Максимальный размер файла: 5 МБ
             </small>
         </div>
+
         <!-- Основные поля формы -->
-        <div class="form-group mb-4">
-            <label class="form-label fw-bold">Заголовок:</label>
+        <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">Заголовок:</label>
             {{ form.title }}
             {% if form.title.errors %}
                 <div class="alert alert-danger mt-2">
@@ -39,8 +47,8 @@
             {% endif %}
         </div>
 
-        <div class="form-group mb-4">
-            <label class="form-label fw-bold">Текст статьи:</label>
+        <div class="mb-3">
+            <label for="{{ form.content.id_for_label }}" class="form-label fw-bold">Текст статьи:</label>
             {{ form.content }}
             {% if form.content.errors %}
                 <div class="alert alert-danger mt-2">
@@ -48,20 +56,16 @@
                 </div>
             {% endif %}
         </div>
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label class="form-label fw-bold">Категория:</label>
-                    {{ form.category }}
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label class="form-label fw-bold">Теги:</label>
-                    {{ form.tags }}
-                </div>
-            </div>
+
+        <div class="mb-3">
+            <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">Категория:</label>
+            {{ form.category }}
         </div>
+        <div class="mb-3">
+            <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">Теги:</label>
+            {{ form.tags }}
+        </div>
+
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <button type="submit" class="btn btn-primary btn-lg">
                 <i class="bi bi-save"></i> Опубликовать
@@ -70,17 +74,6 @@
                 <i class="bi bi-x-circle"></i> Отмена
             </a>
         </div>
-    </form>
-        <!-- Форма для загрузки JSON-файла -->
-    <form method="post" enctype="multipart/form-data" action="{% url 'news:upload_json' %}">
-        {% csrf_token %}
-        <div class="form-group mt-4">
-            <label class="form-label fw-bold">Загрузить JSON-файл:</label>
-            {{ form.json_file }}
-        </div>
-        <button type="submit" class="btn btn-success mt-2">
-            <i class="bi bi-upload"></i> Загрузить новости
-        </button>
     </form>
 </div>
 {% endblock %}

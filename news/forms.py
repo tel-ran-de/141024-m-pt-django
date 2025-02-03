@@ -14,18 +14,20 @@ class ArticleForm(forms.ModelForm):
         model = Article
         fields = ['title', 'content', 'category', 'tags', 'image']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
-            'publication_date': forms.DateInput(attrs={'type': 'date'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control-file'})
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите заголовок'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Введите текст статьи'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'category': 'Категория',
             'tags': 'Теги',
+            'image': 'Обложка статьи',
         }
 
 
 class ArticleUploadForm(forms.Form):
-    json_file = forms.FileField()
+    json_file = forms.FileField(label='Загрузить JSON-файл', widget=forms.FileInput(attrs={'class': 'form-control'}))
 
     def clean_json_file(self):
         json_file = self.cleaned_data.get('json_file')
