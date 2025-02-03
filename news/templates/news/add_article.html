@@ -61,5 +61,16 @@
             </a>
         </div>
     </form>
+        <!-- Форма для загрузки JSON-файла -->
+    <form method="post" enctype="multipart/form-data" action="{% url 'news:upload_json' %}">
+        {% csrf_token %}
+        <div class="form-group mt-4">
+            <label class="form-label fw-bold">Загрузить JSON-файл:</label>
+            <input type="file" name="json_file" class="form-control" accept=".json">
+        </div>
+        <button type="submit" class="btn btn-success mt-2">
+            <i class="bi bi-upload"></i> Загрузить новости
+        </button>
+    </form>
 </div>
 {% endblock %}
