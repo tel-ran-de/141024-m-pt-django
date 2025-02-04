@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
 import unidecode
 
@@ -183,11 +183,13 @@ def search_news(request):
     return render(request, 'news/catalog.html', context=context)
 
 
-def main(request):
-    """
-    Представление рендерит шаблон mian.html
-    """
-    return render(request, 'main.html', context=info)
+class MainView(TemplateView):
+    template_name = 'main.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        return context
 
 
 def about(request):

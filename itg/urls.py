@@ -9,7 +9,7 @@ from news import views
 # Подключаем файл urls.py из приложения news через include
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.main, name='index'),
+    path('', views.MainView.as_view(), name='index'),
     path('about/', views.about, name='about'),
     path('news/', include('news.urls', namespace='news')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
