@@ -6,6 +6,7 @@ from django.db.models import F, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
+from django.views import View
 import unidecode
 
 from .forms import ArticleForm, ArticleUploadForm
@@ -218,40 +219,24 @@ def get_category_by_name(request, slug):
     return HttpResponse(f"Категория {slug}")
 
 
-def get_all_news(request):
-    """Функция для отображения страницы "Каталог"
-    будет возвращать рендер шаблона /templates/news/catalog.html
-    - **`sort`** - ключ для указания типа сортировки с возможными значениями: `publication_date`, `views`.
-    - **`order`** - опциональный ключ для указания направления сортировки с возможными значениями: `asc`, `desc`. По умолчанию `desc`.
-    1. Сортировка по дате добавления в убывающем порядке (по умолчанию): `/news/catalog/`
-    2. Сортировка по количеству просмотров в убывающем порядке: `/news/catalog/?sort=views`
-    3. Сортировка по количеству просмотров в возрастающем порядке: `/news/catalog/?sort=views&order=asc`
-    4. Сортировка по дате добавления в возрастающем порядке: `/news/catalog/?sort=publication_date&order=asc`
-    """
+class GetAllNewsView(View):
+    def get(self, request, *args, **kwargs):
+        sort = request.GET.get('sort', 'publication_date')  # по умолчанию сортируем по дате загрузки
+        order = request.GET.get('order', 'desc')  # по умолчанию сортируем по убыванию
+        valid_sort_fields = {'publication_date', 'views'}
 
-    # считаем параметры из GET-запроса
-    sort = request.GET.get('sort', 'publication_date')  # по умолчанию сортируем по дате загрузки
-    order = request.GET.get('order', 'desc')  # по умолчанию сортируем по убыванию
+        if sort not in valid_sort_fields:
+            sort = 'publication_date'
+        order_by = f'-{sort}' if order == 'desc' else sort
 
-    # Проверяем дали ли мы разрешение на сортировку по этому полю
-    valid_sort_fields = {'publication_date', 'views'}
-    if sort not in valid_sort_fields:
-        sort = 'publication_date'
+        articles = Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
 
-    # Обрабатываем направление сортировки
-    if order == 'asc':
-        order_by = sort
-    else:
-        order_by = f'-{sort}'
+        paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, 'user_ip': request.META.get('REMOTE_ADDR'),}
 
-    articles = Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
-
-    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, 'user_ip': request.META.get('REMOTE_ADDR'),}
-
-    return render(request, 'news/catalog.html', context=context)
+        return render(request, 'news/catalog.html', context=context)
 
 
 def get_detail_article_by_id(request, article_id):
