@@ -18,5 +18,5 @@ urlpatterns = [
     path('edit/<int:article_id>/', views.article_update, name='article_update'),
     path('delete/<int:article_id>/', views.article_delete, name='article_delete'),
     path('upload_json/', views.upload_json_view, name='upload_json'),
-    path('edit_article_from_json/<int:index>/', views.edit_article_from_json, name='edit_article_from_json'),
+    path('edit_article_from_json/<int:index>/', views.EditArticleFromJsonView.as_view(), name='edit_article_from_json'),
 ]

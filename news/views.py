@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.views import View
 from django.views.generic import ListView
+from django.views.generic.edit import FormView
 import unidecode
 
 from .forms import ArticleForm, ArticleUploadForm
@@ -60,37 +61,50 @@ def upload_json_view(request):
     return render(request, 'news/upload_json.html', {'form': form})
 
 
-def edit_article_from_json(request, index):
-    articles_data = request.session.get('articles_data', [])
-    if index >= len(articles_data):
-        return redirect('news:catalog')
-    article_data = articles_data[index]
-    form = ArticleForm(initial={
-        'title': article_data['fields']['title'],
-        'content': article_data['fields']['content'],
-        'category': Category.objects.get(name=article_data['fields']['category']),
-        'tags': [Tag.objects.get(name=tag) for tag in article_data['fields']['tags']]
-    })
-    if request.method == 'POST':
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            if 'next' in request.POST:
-                # Сохраняем текущую статью
-                save_article(article_data, form)
-                # Переходим к следующей статье
-                request.session['current_index'] = index + 1
-                return redirect('news:edit_article_from_json', index=index + 1)
-            elif 'save_all' in request.POST:
-                # Сохраняем текущую статью
-                save_article(article_data, form)
-                # Сохраняем все оставшиеся статьи
-                for i in range(index + 1, len(articles_data)):
-                    save_article(articles_data[i])
-                del request.session['articles_data']
-                del request.session['current_index']
-                return redirect('news:catalog')
-    context = {'form': form, 'index': index, 'total': len(articles_data), 'is_last': index == len(articles_data) - 1}
-    return render(request, 'news/edit_article_from_json.html', context)
+class EditArticleFromJsonView(FormView):
+    template_name = 'news/edit_article_from_json.html'
+    form_class = ArticleForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        index = self.kwargs['index']
+        articles_data = self.request.session.get('articles_data', [])
+        if index >= len(articles_data):
+            return redirect('news:catalog')
+        article_data = articles_data[index]
+        kwargs['initial'] = {
+            'title': article_data['fields']['title'],
+            'content': article_data['fields']['content'],
+            'category': Category.objects.get(name=article_data['fields']['category']),
+            'tags': [Tag.objects.get(name=tag) for tag in article_data['fields']['tags']]
+        }
+        return kwargs
+
+    def form_valid(self, form):
+        index = self.kwargs['index']
+        articles_data = self.request.session.get('articles_data', [])
+        article_data = articles_data[index]
+        if 'next' in self.request.POST:
+            save_article(article_data, form)
+            self.request.session['current_index'] = index + 1
+            return redirect('news:edit_article_from_json', index=index + 1)
+        elif 'save_all' in self.request.POST:
+            save_article(article_data, form)
+            for i in range(index + 1, len(articles_data)):
+                save_article(articles_data[i])
+            del self.request.session['articles_data']
+            del self.request.session['current_index']
+            return redirect('news:catalog')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        index = self.kwargs['index']
+        articles_data = self.request.session.get('articles_data', [])
+        context['index'] = index
+        context['total'] = len(articles_data)
+        context['is_last'] = index == len(articles_data) - 1
+        return context
 
 
 def save_article(article_data, form=None):
