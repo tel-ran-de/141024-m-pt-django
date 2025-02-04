@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.views import View
+from django.views.generic import ListView
 import unidecode
 
 from .forms import ArticleForm, ArticleUploadForm
@@ -219,24 +220,27 @@ def get_category_by_name(request, slug):
     return HttpResponse(f"Категория {slug}")
 
 
-class GetAllNewsView(View):
-    def get(self, request, *args, **kwargs):
-        sort = request.GET.get('sort', 'publication_date')  # по умолчанию сортируем по дате загрузки
-        order = request.GET.get('order', 'desc')  # по умолчанию сортируем по убыванию
-        valid_sort_fields = {'publication_date', 'views'}
+class GetAllNewsView(ListView):
+    model = Article
+    template_name = 'news/catalog.html'
+    context_object_name = 'news'
+    paginate_by = 20
 
+    def get_queryset(self):
+        sort = self.request.GET.get('sort', 'publication_date')  # по умолчанию сортируем по дате загрузки
+        order = self.request.GET.get('order', 'desc')  # по умолчанию сортируем по убыванию
+        valid_sort_fields = {'publication_date', 'views'}
         if sort not in valid_sort_fields:
             sort = 'publication_date'
         order_by = f'-{sort}' if order == 'desc' else sort
 
-        articles = Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
+        return Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
 
-        paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-        context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, 'user_ip': request.META.get('REMOTE_ADDR'),}
-
-        return render(request, 'news/catalog.html', context=context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+        return context
 
 
 def get_detail_article_by_id(request, article_id):
