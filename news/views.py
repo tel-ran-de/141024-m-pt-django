@@ -5,9 +5,10 @@ from django.db import models
 from django.db.models import F, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
 from django.utils.text import slugify
 from django.views import View
-from django.views.generic import CreateView, ListView, TemplateView
+from django.views.generic import CreateView, ListView, TemplateView, UpdateView
 from django.views.generic.base import ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
@@ -317,18 +318,14 @@ class AddArticleView(BaseMixin, CreateView):
         return unique_slug
 
 
-def article_update(request, article_id):
-    article = get_object_or_404(Article, pk=article_id)
+class ArticleUpdateView(BaseMixin, UpdateView):
+    model = Article
+    form_class = ArticleForm
+    template_name = 'news/edit_article.html'
+    context_object_name = 'article'
 
-    if request.method == "POST":
-        form = ArticleForm(request.POST, request.FILES, instance=article)
-        if form.is_valid():
-            form.save()
-            return redirect('news:detail_article_by_id', article_id=article.id)
-    else:
-        form = ArticleForm(instance=article)
-    context = {'form': form, 'article': article}
-    return render(request, 'news/edit_article.html', context=context)
+    def get_success_url(self):
+        return reverse_lazy('news:detail_article_by_id', kwargs={'pk': self.object.pk})
 
 
 def article_delete(request, article_id):
