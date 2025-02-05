@@ -57,30 +57,25 @@ class FavoritesView(BaseArticleListView):
 
 class SearchNewsView(BaseArticleListView):
     def get_queryset(self):
-        query = self.request.GET.get('q')
-        return Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query)) if query else Article.objects.all()
+        return Article.objects.search(self.request.GET.get('q'))
 
 
 class GetNewsByCategoryView(BaseArticleListView):
     def get_queryset(self):
-        category = get_object_or_404(Category, pk=self.kwargs['category_id'])
-        return Article.objects.filter(category=category)
+        return Article.objects.by_category(self.kwargs['category_id'])
 
 
 class GetNewsByTagView(BaseArticleListView):
     def get_queryset(self):
-        tag = get_object_or_404(Tag, pk=self.kwargs['tag_id'])
-        return Article.objects.filter(tags=tag)
+        return Article.objects.by_tag(self.kwargs['tag_id'])
 
 
 class GetAllNewsView(BaseArticleListView):
     def get_queryset(self):
-        sort = self.request.GET.get('sort', 'publication_date')
-        order = self.request.GET.get('order', 'desc')
-        valid_sort_fields = {'publication_date', 'views'}
-        sort = sort if sort in valid_sort_fields else 'publication_date'
-        order_by = f'-{sort}' if order == 'desc' else sort
-        return Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
+        return Article.objects.sorted(
+            sort=self.request.GET.get('sort', 'publication_date'),
+            order=self.request.GET.get('order', 'desc')
+        )
 
 
 class BaseToggleStatusView(BaseMixin, View):
@@ -104,8 +99,8 @@ class ToggleLikeView(BaseToggleStatusView):
 
 
 class BaseJsonFormView(BaseMixin, FormView):
-
     """Базовый класс для работы с JSON-файлами статей."""
+
     def get_articles_data(self):
         return self.request.session.get('articles_data', [])
 

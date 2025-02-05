@@ -1,15 +1,49 @@
 import unidecode
 
 from django.db import models
+from django.db.models import Q
 from django.utils.text import slugify
+
+
+class ArticleQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def by_category(self, category_id):
+        return self.active().filter(category_id=category_id)
+
+    def by_tag(self, tag_id):
+        return self.active().filter(tags__id=tag_id)
+
+    def search(self, query):
+        return self.active().filter(Q(title__icontains=query) | Q(content__icontains=query))
+
+    def sorted(self, sort='publication_date', order='desc'):
+        valid_sort_fields = {'publication_date', 'views'}
+        if sort not in valid_sort_fields:
+            sort = 'publication_date'
+        order_by = f'-{sort}' if order == 'desc' else sort
+        return self.active().order_by(order_by)
 
 
 class ArticleManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return ArticleQuerySet(self.model, using=self._db)
 
-    def sorted_by_title(self):
-        return self.get_queryset().all().order_by('-title')
+    def active(self):
+        return self.get_queryset().active()
+
+    def by_category(self, category_id):
+        return self.get_queryset().by_category(category_id)
+
+    def by_tag(self, tag_id):
+        return self.get_queryset().by_tag(tag_id)
+
+    def search(self, query):
+        return self.get_queryset().search(query)
+
+    def sorted(self, sort='publication_date', order='desc'):
+        return self.get_queryset().sorted(sort, order)
 
 
 class AllArticleManager(models.Manager):
