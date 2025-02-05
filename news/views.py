@@ -143,11 +143,21 @@ def save_article(article_data, form=None):
     return article
 
 
-def favorites(request):
-    ip_address = request.META.get('REMOTE_ADDR')
-    favorite_articles = Article.objects.filter(favorites__ip_address=ip_address)
-    context = {**info, 'news': favorite_articles, 'news_count': len(favorite_articles), 'page_obj': favorite_articles, 'user_ip': request.META.get('REMOTE_ADDR'), }
-    return render(request, 'news/catalog.html', context=context)
+class FavoritesView(ListView):
+    model = Article
+    template_name = 'news/catalog.html'
+    context_object_name = 'news'
+    paginate_by = 20
+
+    def get_queryset(self):
+        ip_address = self.request.META.get('REMOTE_ADDR')
+        return Article.objects.filter(favorites__ip_address=ip_address)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+        return context
 
 
 class ToggleFavoriteView(View):
