@@ -218,6 +218,7 @@ class GetNewsByCategoryView(ListView):
         category_id = self.kwargs['category_id']
         category = get_object_or_404(Category, pk=category_id)
         return Article.objects.filter(category=category)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(info)
@@ -225,16 +226,22 @@ class GetNewsByCategoryView(ListView):
         return context
 
 
-def get_news_by_tag(request, tag_id):
-    tag = get_object_or_404(Tag, pk=tag_id)
-    articles = Article.objects.filter(tags=tag)
+class GetNewsByTagView(ListView):
+    model = Article
+    template_name = 'news/catalog.html'
+    context_object_name = 'news'
+    paginate_by = 20
 
-    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj,}
+    def get_queryset(self):
+        tag_id = self.kwargs['tag_id']
+        tag = get_object_or_404(Tag, pk=tag_id)
+        return Article.objects.filter(tags=tag)
 
-    return render(request, 'news/catalog.html', context=context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+        return context
 
 
 def get_category_by_name(request, slug):
