@@ -12,10 +12,11 @@ from django.views.generic import CreateView, DeleteView, ListView, TemplateView,
 from django.views.generic.base import ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
+
 import unidecode
 
 from .forms import ArticleForm, ArticleUploadForm
-from .models import Article, Favorite, Category, Like, Tag
+from .models import Article, Category, Favorite, Like, Tag
 
 
 class BaseMixin(ContextMixin):
@@ -36,6 +37,52 @@ class BaseMixin(ContextMixin):
         return context
 
 
+class BaseArticleListView(BaseMixin, ListView):
+    model = Article
+    template_name = 'news/catalog.html'
+    context_object_name = 'news'
+    paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+        return context
+
+
+class FavoritesView(BaseArticleListView):
+    def get_queryset(self):
+        ip_address = self.request.META.get('REMOTE_ADDR')
+        return Article.objects.filter(favorites__ip_address=ip_address)
+
+
+class SearchNewsView(BaseArticleListView):
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        return Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query)) if query else Article.objects.all()
+
+
+class GetNewsByCategoryView(BaseArticleListView):
+    def get_queryset(self):
+        category = get_object_or_404(Category, pk=self.kwargs['category_id'])
+        return Article.objects.filter(category=category)
+
+
+class GetNewsByTagView(BaseArticleListView):
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, pk=self.kwargs['tag_id'])
+        return Article.objects.filter(tags=tag)
+
+
+class GetAllNewsView(BaseArticleListView):
+    def get_queryset(self):
+        sort = self.request.GET.get('sort', 'publication_date')
+        order = self.request.GET.get('order', 'desc')
+        valid_sort_fields = {'publication_date', 'views'}
+        sort = sort if sort in valid_sort_fields else 'publication_date'
+        order_by = f'-{sort}' if order == 'desc' else sort
+        return Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
+
+
 class UploadJsonView(BaseMixin, FormView):
     template_name = 'news/upload_json.html'
     form_class = ArticleUploadForm
@@ -48,8 +95,10 @@ class UploadJsonView(BaseMixin, FormView):
             errors = form.validate_json_data(data)
             if errors:
                 return self.form_invalid(form)
+
             self.request.session['articles_data'] = data
             self.request.session['current_index'] = 0
+
             return redirect('news:edit_article_from_json', index=0)
         except json.JSONDecodeError:
             form.add_error(None, 'Неверный формат JSON-файла')
@@ -66,6 +115,7 @@ class EditArticleFromJsonView(BaseMixin, FormView):
         articles_data = self.request.session.get('articles_data', [])
         if index >= len(articles_data):
             return redirect('news:catalog')
+
         article_data = articles_data[index]
         kwargs['initial'] = {
             'title': article_data['fields']['title'],
@@ -79,6 +129,7 @@ class EditArticleFromJsonView(BaseMixin, FormView):
         index = self.kwargs['index']
         articles_data = self.request.session.get('articles_data', [])
         article_data = articles_data[index]
+
         if 'next' in self.request.POST:
             save_article(article_data, form)
             self.request.session['current_index'] = index + 1
@@ -107,7 +158,9 @@ def save_article(article_data, form=None):
     content = fields['content']
     category_name = fields['category']
     tags_names = fields['tags']
+
     category = Category.objects.get(name=category_name)
+
     # Генерируем slug до создания статьи
     base_slug = slugify(unidecode.unidecode(title))
     unique_slug = base_slug
@@ -115,6 +168,7 @@ def save_article(article_data, form=None):
     while Article.objects.filter(slug=unique_slug).exists():
         unique_slug = f"{base_slug}-{num}"
         num += 1
+
     if form:
         article = form.save(commit=False)
         article.slug = unique_slug
@@ -133,23 +187,8 @@ def save_article(article_data, form=None):
         for tag_name in tags_names:
             tag = Tag.objects.get(name=tag_name)
             article.tags.add(tag)
+
     return article
-
-
-class FavoritesView(BaseMixin, ListView):
-    model = Article
-    template_name = 'news/catalog.html'
-    context_object_name = 'news'
-    paginate_by = 20
-
-    def get_queryset(self):
-        ip_address = self.request.META.get('REMOTE_ADDR')
-        return Article.objects.filter(favorites__ip_address=ip_address)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
-        return context
 
 
 class ToggleFavoriteView(BaseMixin, View):
@@ -172,105 +211,12 @@ class ToggleLikeView(BaseMixin, View):
         return redirect('news:detail_article_by_id', pk=article_id)
 
 
-class SearchNewsView(BaseMixin, ListView):
-    model = Article
-    template_name = 'news/catalog.html'
-    context_object_name = 'news'
-    paginate_by = 20
-
-    def get_queryset(self):
-        query = self.request.GET.get('q')
-        if query:
-            return Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
-        return Article.objects.all()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
-        return context
-
-
 class MainView(BaseMixin, TemplateView):
     template_name = 'main.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
 
 class AboutView(BaseMixin, TemplateView):
     template_name = 'about.html'
-
-
-def catalog(request):
-    return HttpResponse('Каталог новостей')
-
-
-def get_categories(request):
-    """
-    Возвращает все категории для представления в каталоге
-    """
-    return HttpResponse('All categories')
-
-
-class GetNewsByCategoryView(BaseMixin, ListView):
-    model = Article
-    template_name = 'news/catalog.html'
-    context_object_name = 'news'
-    paginate_by = 20
-
-    def get_queryset(self):
-        category_id = self.kwargs['category_id']
-        category = get_object_or_404(Category, pk=category_id)
-        return Article.objects.filter(category=category)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
-        return context
-
-
-class GetNewsByTagView(BaseMixin, ListView):
-    model = Article
-    template_name = 'news/catalog.html'
-    context_object_name = 'news'
-    paginate_by = 20
-
-    def get_queryset(self):
-        tag_id = self.kwargs['tag_id']
-        tag = get_object_or_404(Tag, pk=tag_id)
-        return Article.objects.filter(tags=tag)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
-        return context
-
-
-def get_category_by_name(request, slug):
-    return HttpResponse(f"Категория {slug}")
-
-
-class GetAllNewsView(BaseMixin, ListView):
-    model = Article
-    template_name = 'news/catalog.html'
-    context_object_name = 'news'
-    paginate_by = 20
-
-    def get_queryset(self):
-        sort = self.request.GET.get('sort', 'publication_date')  # по умолчанию сортируем по дате загрузки
-        order = self.request.GET.get('order', 'desc')  # по умолчанию сортируем по убыванию
-        valid_sort_fields = {'publication_date', 'views'}
-        if sort not in valid_sort_fields:
-            sort = 'publication_date'
-        order_by = f'-{sort}' if order == 'desc' else sort
-
-        return Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
-        return context
 
 
 class ArticleDetailView(BaseMixin, DetailView):
@@ -281,7 +227,7 @@ class ArticleDetailView(BaseMixin, DetailView):
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
         article = self.get_object()
-
+        # Увеличиваем счетчик просмотров только один раз за сессию для каждой новости
         viewed_articles = request.session.get('viewed_articles', [])
         if article.id not in viewed_articles:
             article.views += 1
