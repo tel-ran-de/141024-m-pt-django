@@ -308,15 +308,6 @@ class ArticleDetailView(DetailView):
         return context
 
 
-def get_detail_article_by_title(request, title):
-
-    article = get_object_or_404(Article, slug=title)
-
-    context = {**info, 'article': article, 'user_ip': request.META.get('REMOTE_ADDR'),}
-
-    return render(request, 'news/article_detail.html', context=context)
-
-
 def add_article(request):
     if request.method == "POST":
         form = ArticleForm(request.POST, request.FILES)
