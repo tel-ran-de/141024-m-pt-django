@@ -83,6 +83,26 @@ class GetAllNewsView(BaseArticleListView):
         return Article.objects.select_related('category').prefetch_related('tags').order_by(order_by)
 
 
+class BaseToggleStatusView(BaseMixin, View):
+    model = None  # Дочерний класс должен определить модель
+
+    def post(self, request, article_id, *args, **kwargs):
+        article = get_object_or_404(Article, pk=article_id)
+        ip_address = request.META.get('REMOTE_ADDR')
+        obj, created = self.model.objects.get_or_create(article=article, ip_address=ip_address)
+        if not created:
+            obj.delete()
+        return redirect('news:detail_article_by_id', pk=article_id)
+
+
+class ToggleFavoriteView(BaseToggleStatusView):
+    model = Favorite
+
+
+class ToggleLikeView(BaseToggleStatusView):
+    model = Like
+
+
 class UploadJsonView(BaseMixin, FormView):
     template_name = 'news/upload_json.html'
     form_class = ArticleUploadForm
@@ -189,26 +209,6 @@ def save_article(article_data, form=None):
             article.tags.add(tag)
 
     return article
-
-
-class ToggleFavoriteView(BaseMixin, View):
-    def post(self, request, article_id, *args, **kwargs):
-        article = get_object_or_404(Article, pk=article_id)
-        ip_address = request.META.get('REMOTE_ADDR')
-        favorite, created = Favorite.objects.get_or_create(article=article, ip_address=ip_address)
-        if not created:
-            favorite.delete()
-        return redirect('news:detail_article_by_id', pk=article_id)
-
-
-class ToggleLikeView(BaseMixin, View):
-    def post(self, request, article_id, *args, **kwargs):
-        article = get_object_or_404(Article, pk=article_id)
-        ip_address = request.META.get('REMOTE_ADDR')
-        like, created = Like.objects.get_or_create(article=article, ip_address=ip_address)
-        if not created:
-            like.delete()
-        return redirect('news:detail_article_by_id', pk=article_id)
 
 
 class MainView(BaseMixin, TemplateView):
