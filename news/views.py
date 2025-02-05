@@ -40,26 +40,24 @@ info = {
 }
 
 
-def upload_json_view(request):
-    if request.method == 'POST':
-        form = ArticleUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            json_file = form.cleaned_data['json_file']
-            try:
-                data = json.load(json_file)
-                errors = form.validate_json_data(data)
-                if errors:
-                    return render(request, 'news/upload_json.html', {'form': form, 'errors': errors})
+class UploadJsonView(FormView):
+    template_name = 'news/upload_json.html'
+    form_class = ArticleUploadForm
+    success_url = '/news/catalog/'
 
-                # Сохраняем данные в сессию для последовательного просмотра
-                request.session['articles_data'] = data
-                request.session['current_index'] = 0
-                return redirect('news:edit_article_from_json', index=0)
-            except json.JSONDecodeError:
-                return render(request, 'news/upload_json.html', {'form': form, 'error': 'Неверный формат JSON-файла'})
-    else:
-        form = ArticleUploadForm()
-    return render(request, 'news/upload_json.html', {'form': form})
+    def form_valid(self, form):
+        json_file = form.cleaned_data['json_file']
+        try:
+            data = json.load(json_file)
+            errors = form.validate_json_data(data)
+            if errors:
+                return self.form_invalid(form)
+            self.request.session['articles_data'] = data
+            self.request.session['current_index'] = 0
+            return redirect('news:edit_article_from_json', index=0)
+        except json.JSONDecodeError:
+            form.add_error(None, 'Неверный формат JSON-файла')
+            return self.form_invalid(form)
 
 
 class EditArticleFromJsonView(FormView):
