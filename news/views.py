@@ -193,9 +193,8 @@ class MainView(TemplateView):
         return context
 
 
-def about(request):
-    """Представление рендерит шаблон about.html"""
-    return render(request, 'about.html', context=info)
+class AboutView(TemplateView):
+    template_name = 'about.html'
 
 
 def catalog(request):
