@@ -168,20 +168,23 @@ def toggle_like(request, article_id):
     return redirect('news:detail_article_by_id', article_id=article_id)
 
 
-def search_news(request):
-    query = request.GET.get('q')
-    categories = Category.objects.all()
-    if query:
-        articles = Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
-    else:
-        articles = Article.objects.all()
+class SearchNewsView(ListView):
+    model = Article
+    template_name = 'news/catalog.html'
+    context_object_name = 'news'
+    paginate_by = 20
 
-    paginator = Paginator(articles, 10)  # Показывать 10 новостей на странице
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {**info, 'news': articles, 'news_count': len(articles), 'page_obj': page_obj, 'user_ip': request.META.get('REMOTE_ADDR'),}
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            return Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
+        return Article.objects.all()
 
-    return render(request, 'news/catalog.html', context=context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(info)
+        context['user_ip'] = self.request.META.get('REMOTE_ADDR')
+        return context
 
 
 class MainView(TemplateView):
