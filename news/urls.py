@@ -16,7 +16,7 @@ urlpatterns = [
     path('favorites/', views.FavoritesView.as_view(), name='favorites'),
     path('add/', views.AddArticleView.as_view(), name='add_article'),
     path('edit/<int:pk>/', views.ArticleUpdateView.as_view(), name='article_update'),
-    path('delete/<int:article_id>/', views.article_delete, name='article_delete'),
+    path('delete/<int:pk>/', views.ArticleDeleteView.as_view(), name='article_delete'),
     path('upload_json/', views.UploadJsonView.as_view(), name='upload_json'),
     path('edit_article_from_json/<int:index>/', views.EditArticleFromJsonView.as_view(), name='edit_article_from_json'),
 ]
