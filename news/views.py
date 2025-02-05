@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.views import View
-from django.views.generic import ListView, TemplateView
+from django.views.generic import CreateView, ListView, TemplateView
 from django.views.generic.base import ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
@@ -295,24 +295,26 @@ class ArticleDetailView(BaseMixin, DetailView):
         return context
 
 
-def add_article(request):
-    if request.method == "POST":
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            article_data = {
-                'fields': {
-                    'title': form.cleaned_data['title'],
-                    'content': form.cleaned_data['content'],
-                    'category': form.cleaned_data['category'].name,
-                    'tags': [tag.name for tag in form.cleaned_data['tags']]
-                }
-            }
-            article = save_article(article_data, form)
-            return redirect('news:detail_article_by_id', article_id=article.id)
-    else:
-        form = ArticleForm()
-    context = {'form': form}
-    return render(request, 'news/add_article.html', context=context)
+class AddArticleView(BaseMixin, CreateView):
+    model = Article
+    form_class = ArticleForm
+    template_name = 'news/add_article.html'
+
+    def form_valid(self, form):
+        article = form.save(commit=False)
+        article.slug = self.generate_unique_slug(form.cleaned_data['title'])
+        article.save()
+        form.save_m2m()
+        return redirect('news:detail_article_by_id', pk=article.id)
+
+    def generate_unique_slug(self, title):
+        base_slug = slugify(unidecode.unidecode(title))
+        unique_slug = base_slug
+        num = 1
+        while Article.objects.filter(slug=unique_slug).exists():
+            unique_slug = f"{base_slug}-{num}"
+            num += 1
+        return unique_slug
 
 
 def article_update(request, article_id):
