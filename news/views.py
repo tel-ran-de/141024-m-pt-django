@@ -103,7 +103,23 @@ class ToggleLikeView(BaseToggleStatusView):
     model = Like
 
 
-class UploadJsonView(BaseMixin, FormView):
+class BaseJsonFormView(BaseMixin, FormView):
+
+    """Базовый класс для работы с JSON-файлами статей."""
+    def get_articles_data(self):
+        return self.request.session.get('articles_data', [])
+
+    def set_articles_data(self, data):
+        self.request.session['articles_data'] = data
+
+    def get_current_index(self):
+        return self.request.session.get('current_index', 0)
+
+    def set_current_index(self, index):
+        self.request.session['current_index'] = index
+
+
+class UploadJsonView(BaseJsonFormView):
     template_name = 'news/upload_json.html'
     form_class = ArticleUploadForm
     success_url = '/news/catalog/'
@@ -116,8 +132,8 @@ class UploadJsonView(BaseMixin, FormView):
             if errors:
                 return self.form_invalid(form)
 
-            self.request.session['articles_data'] = data
-            self.request.session['current_index'] = 0
+            self.set_articles_data(data)
+            self.set_current_index(0)
 
             return redirect('news:edit_article_from_json', index=0)
         except json.JSONDecodeError:
@@ -125,14 +141,14 @@ class UploadJsonView(BaseMixin, FormView):
             return self.form_invalid(form)
 
 
-class EditArticleFromJsonView(BaseMixin, FormView):
+class EditArticleFromJsonView(BaseJsonFormView):
     template_name = 'news/edit_article_from_json.html'
     form_class = ArticleForm
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         index = self.kwargs['index']
-        articles_data = self.request.session.get('articles_data', [])
+        articles_data = self.get_articles_data()
         if index >= len(articles_data):
             return redirect('news:catalog')
 
@@ -140,19 +156,19 @@ class EditArticleFromJsonView(BaseMixin, FormView):
         kwargs['initial'] = {
             'title': article_data['fields']['title'],
             'content': article_data['fields']['content'],
-            'category': Category.objects.get(name=article_data['fields']['category']),
-            'tags': [Tag.objects.get(name=tag) for tag in article_data['fields']['tags']]
+            'category': get_object_or_404(Category, name=article_data['fields']['category']),
+            'tags': [get_object_or_404(Tag, name=tag) for tag in article_data['fields']['tags']]
         }
         return kwargs
 
     def form_valid(self, form):
         index = self.kwargs['index']
-        articles_data = self.request.session.get('articles_data', [])
+        articles_data = self.get_articles_data()
         article_data = articles_data[index]
 
         if 'next' in self.request.POST:
             save_article(article_data, form)
-            self.request.session['current_index'] = index + 1
+            self.set_current_index(index + 1)
             return redirect('news:edit_article_from_json', index=index + 1)
         elif 'save_all' in self.request.POST:
             save_article(article_data, form)
@@ -165,7 +181,7 @@ class EditArticleFromJsonView(BaseMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         index = self.kwargs['index']
-        articles_data = self.request.session.get('articles_data', [])
+        articles_data = self.get_articles_data()
         context['index'] = index
         context['total'] = len(articles_data)
         context['is_last'] = index == len(articles_data) - 1
