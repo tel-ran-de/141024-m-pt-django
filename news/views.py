@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.views import View
 from django.views.generic import ListView, TemplateView
+from django.views.generic.base import ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 import unidecode
@@ -16,31 +17,25 @@ from .forms import ArticleForm, ArticleUploadForm
 from .models import Article, Favorite, Category, Like, Tag
 
 
-info = {
-    "users_count": 5,
-    "news_count": 10,
-    "categories": Category.objects.all(),
-    "menu": [
-        {"title": "Главная",
-         "url": "/",
-         "url_name": "index"},
-        {"title": "О проекте",
-         "url": "/about/",
-         "url_name": "about"},
-        {"title": "Каталог",
-         "url": "/news/catalog/",
-         "url_name": "news:catalog"},
-        {"title": "Добавить статью",
-         "url": "/news/add/",
-         "url_name": "news:add_article"},
-        {"title": "Избранное",
-         "url": "/news/favorites/",
-         "url_name": "news:favorites"},
-    ],
-}
+class BaseMixin(ContextMixin):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "users_count": 5,
+            "news_count": 10,
+            "categories": Category.objects.all(),
+            "menu": [
+                {"title": "Главная", "url": "/", "url_name": "index"},
+                {"title": "О проекте", "url": "/about/", "url_name": "about"},
+                {"title": "Каталог", "url": "/news/catalog/", "url_name": "news:catalog"},
+                {"title": "Добавить статью", "url": "/news/add/", "url_name": "news:add_article"},
+                {"title": "Избранное", "url": "/news/favorites/", "url_name": "news:favorites"},
+            ],
+        })
+        return context
 
 
-class UploadJsonView(FormView):
+class UploadJsonView(BaseMixin, FormView):
     template_name = 'news/upload_json.html'
     form_class = ArticleUploadForm
     success_url = '/news/catalog/'
@@ -60,7 +55,7 @@ class UploadJsonView(FormView):
             return self.form_invalid(form)
 
 
-class EditArticleFromJsonView(FormView):
+class EditArticleFromJsonView(BaseMixin, FormView):
     template_name = 'news/edit_article_from_json.html'
     form_class = ArticleForm
 
@@ -97,7 +92,6 @@ class EditArticleFromJsonView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(info)
         index = self.kwargs['index']
         articles_data = self.request.session.get('articles_data', [])
         context['index'] = index
@@ -141,7 +135,7 @@ def save_article(article_data, form=None):
     return article
 
 
-class FavoritesView(ListView):
+class FavoritesView(BaseMixin, ListView):
     model = Article
     template_name = 'news/catalog.html'
     context_object_name = 'news'
@@ -153,12 +147,11 @@ class FavoritesView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(info)
         context['user_ip'] = self.request.META.get('REMOTE_ADDR')
         return context
 
 
-class ToggleFavoriteView(View):
+class ToggleFavoriteView(BaseMixin, View):
     def post(self, request, article_id, *args, **kwargs):
         article = get_object_or_404(Article, pk=article_id)
         ip_address = request.META.get('REMOTE_ADDR')
@@ -168,7 +161,7 @@ class ToggleFavoriteView(View):
         return redirect('news:detail_article_by_id', pk=article_id)
 
 
-class ToggleLikeView(View):
+class ToggleLikeView(BaseMixin, View):
     def post(self, request, article_id, *args, **kwargs):
         article = get_object_or_404(Article, pk=article_id)
         ip_address = request.META.get('REMOTE_ADDR')
@@ -178,7 +171,7 @@ class ToggleLikeView(View):
         return redirect('news:detail_article_by_id', pk=article_id)
 
 
-class SearchNewsView(ListView):
+class SearchNewsView(BaseMixin, ListView):
     model = Article
     template_name = 'news/catalog.html'
     context_object_name = 'news'
@@ -192,21 +185,19 @@ class SearchNewsView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(info)
         context['user_ip'] = self.request.META.get('REMOTE_ADDR')
         return context
 
 
-class MainView(TemplateView):
+class MainView(BaseMixin, TemplateView):
     template_name = 'main.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(info)
         return context
 
 
-class AboutView(TemplateView):
+class AboutView(BaseMixin, TemplateView):
     template_name = 'about.html'
 
 
@@ -221,7 +212,7 @@ def get_categories(request):
     return HttpResponse('All categories')
 
 
-class GetNewsByCategoryView(ListView):
+class GetNewsByCategoryView(BaseMixin, ListView):
     model = Article
     template_name = 'news/catalog.html'
     context_object_name = 'news'
@@ -234,12 +225,11 @@ class GetNewsByCategoryView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(info)
         context['user_ip'] = self.request.META.get('REMOTE_ADDR')
         return context
 
 
-class GetNewsByTagView(ListView):
+class GetNewsByTagView(BaseMixin, ListView):
     model = Article
     template_name = 'news/catalog.html'
     context_object_name = 'news'
@@ -252,7 +242,6 @@ class GetNewsByTagView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(info)
         context['user_ip'] = self.request.META.get('REMOTE_ADDR')
         return context
 
@@ -261,7 +250,7 @@ def get_category_by_name(request, slug):
     return HttpResponse(f"Категория {slug}")
 
 
-class GetAllNewsView(ListView):
+class GetAllNewsView(BaseMixin, ListView):
     model = Article
     template_name = 'news/catalog.html'
     context_object_name = 'news'
@@ -279,12 +268,11 @@ class GetAllNewsView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(info)
         context['user_ip'] = self.request.META.get('REMOTE_ADDR')
         return context
 
 
-class ArticleDetailView(DetailView):
+class ArticleDetailView(BaseMixin, DetailView):
     model = Article
     template_name = 'news/article_detail.html'
     context_object_name = 'article'
@@ -303,7 +291,6 @@ class ArticleDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(info)
         context['user_ip'] = self.request.META.get('REMOTE_ADDR')
         return context
 
@@ -324,7 +311,7 @@ def add_article(request):
             return redirect('news:detail_article_by_id', article_id=article.id)
     else:
         form = ArticleForm()
-    context = {'form': form, 'menu': info['menu']}
+    context = {'form': form}
     return render(request, 'news/add_article.html', context=context)
 
 
@@ -338,7 +325,7 @@ def article_update(request, article_id):
             return redirect('news:detail_article_by_id', article_id=article.id)
     else:
         form = ArticleForm(instance=article)
-    context = {'form': form, 'menu': info['menu'], 'article': article}
+    context = {'form': form, 'article': article}
     return render(request, 'news/edit_article.html', context=context)
 
 
@@ -349,5 +336,5 @@ def article_delete(request, article_id):
         article.delete()
         return redirect('news:catalog')
 
-    context = {'menu': info['menu'], 'article': article}
+    context = {'article': article}
     return render(request, 'news/delete_article.html', context=context)
