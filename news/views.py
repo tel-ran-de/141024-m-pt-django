@@ -160,13 +160,14 @@ class ToggleFavoriteView(View):
         return redirect('news:detail_article_by_id', pk=article_id)
 
 
-def toggle_like(request, article_id):
-    article = get_object_or_404(Article, pk=article_id)
-    ip_address = request.META.get('REMOTE_ADDR')
-    like, created = Like.objects.get_or_create(article=article, ip_address=ip_address)
-    if not created:
-        like.delete()
-    return redirect('news:detail_article_by_id', article_id=article_id)
+class ToggleLikeView(View):
+    def post(self, request, article_id, *args, **kwargs):
+        article = get_object_or_404(Article, pk=article_id)
+        ip_address = request.META.get('REMOTE_ADDR')
+        like, created = Like.objects.get_or_create(article=article, ip_address=ip_address)
+        if not created:
+            like.delete()
+        return redirect('news:detail_article_by_id', pk=article_id)
 
 
 class SearchNewsView(ListView):
