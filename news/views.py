@@ -259,7 +259,6 @@ class AddArticleView(LoginRequiredMixin, BaseMixin, CreateView):
     model = Article
     form_class = ArticleForm
     template_name = 'news/add_article.html'
-    login_url = reverse_lazy('users:login')  # URL для перенаправления при неавторизованном пользователе на страницу аутентификации
     redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
 
     def form_valid(self, form):
@@ -279,18 +278,20 @@ class AddArticleView(LoginRequiredMixin, BaseMixin, CreateView):
         return unique_slug
 
 
-class ArticleUpdateView(BaseMixin, UpdateView):
+class ArticleUpdateView(LoginRequiredMixin, BaseMixin, UpdateView):
     model = Article
     form_class = ArticleForm
     template_name = 'news/edit_article.html'
     context_object_name = 'article'
+    redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему
 
     def get_success_url(self):
         return reverse_lazy('news:detail_article_by_id', kwargs={'pk': self.object.pk})
 
 
-class ArticleDeleteView(BaseMixin, DeleteView):
+class ArticleDeleteView(LoginRequiredMixin, BaseMixin, DeleteView):
     model = Article
     template_name = 'news/delete_article.html'
     context_object_name = 'article'
     success_url = reverse_lazy('news:catalog')
+    redirect_field_name = 'next'  # Имя параметра URL, используемого для перенаправления после успешного входа в систему

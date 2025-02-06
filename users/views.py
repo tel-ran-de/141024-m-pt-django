@@ -5,9 +5,10 @@ from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
 
 from .forms import CustomAuthenticationForm
+from news.views import BaseMixin
 
 
-class LoginUser(LoginView):
+class LoginUser(BaseMixin, LoginView):
     form_class = CustomAuthenticationForm
     template_name = 'users/login.html'
     extra_context = {'title': 'Авторизация'}
