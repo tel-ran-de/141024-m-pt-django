@@ -1,4 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
@@ -6,22 +8,16 @@ from django.urls import reverse_lazy
 from .forms import LoginUserPassword
 
 
-def login_user(request):
-    if request.method == 'POST':
-        form = LoginUserPassword(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                next_url = request.POST.get('next', '').strip()  # получаем либо next либо пустую строку
-                if next_url:  # если next не пустая строка
-                    return redirect(request.POST.get('next', 'news:catalog'))
-                return redirect(reverse_lazy('news:catalog'))  # если next пустая строка, то перенаправляем
-    else:
-        form = LoginUserPassword()
-    return render(request, 'users/login.html', {'form': form})
+class LoginUser(LoginView):
+    form_class = AuthenticationForm
+    template_name = 'users/login.html'
+    extra_context = {'title': 'Авторизация'}
+    redirect_field_name = 'next'
+
+    def get_success_url(self):
+        if self.request.GET.get('next', '').strip():
+            return self.request.POST.get('next')
+        return reverse_lazy('news:catalog')
 
 
 def logout_user(request):
