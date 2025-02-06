@@ -5,6 +5,7 @@
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
             <button type="submit" class="btn btn-dark">Войти</button>
         </form>
     </div>

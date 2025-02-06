@@ -14,7 +14,7 @@ def login_user(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('news:catalog')
+                return redirect(request.POST.get('next', 'news:catalog'))
     else:
         form = LoginUserPassword()
     return render(request, 'users/login.html', {'form': form})
