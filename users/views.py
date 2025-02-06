@@ -1,15 +1,14 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
 
-from .forms import LoginUserPassword
+from .forms import CustomAuthenticationForm
 
 
 class LoginUser(LoginView):
-    form_class = AuthenticationForm
+    form_class = CustomAuthenticationForm
     template_name = 'users/login.html'
     extra_context = {'title': 'Авторизация'}
     redirect_field_name = 'next'
