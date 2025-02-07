@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% load customtags %}
 {% block content %}
@@ -17,7 +16,11 @@
                 <i class="bi bi-eye"></i>
                 {{ article.views }}
             </span>
+            <span class="ms-3 text-muted">
+                <i class="bi bi-person-fill"></i> {{ article.author|default:'Аноним' }}
+            </span>
         </div>
+
         <!-- Изображение -->
         {% if article.image %}
         <div class="article-image mb-5">
@@ -30,17 +33,22 @@
             </div>
         </div>
         {% endif %}
+
         <!-- Содержание -->
         <div class="article-content mb-5">
             {{ article.content|linebreaks }}
         </div>
-        <!-- Категория и теги -->
+
+        <!-- Категория -->
+        <div class="article-taxonomy mb-3">
+            <a href="{% url 'news:get_news_by_category' article.category.id %}"
+               class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-bookmark"></i> {{ article.category }}
+            </a>
+        </div>
+        <!-- Теги -->
         <div class="article-taxonomy mb-5">
             <div class="d-flex flex-wrap gap-2">
-                <a href="{% url 'news:get_news_by_category' article.category.id %}"
-                   class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-bookmark"></i> {{ article.category }}
-                </a>
                 {% for tag in article.tags.all %}
                 <a href="{% url 'news:get_news_by_tag' tag.id %}"
                    class="btn btn-sm btn-outline-secondary"
@@ -48,6 +56,32 @@
                     <i class="bi bi-tag"></i> {{ tag.name|upper }}
                 </a>
                 {% endfor %}
+            </div>
+        </div>
+
+        <!-- Лайки и избранное -->
+        <div class="article-actions border-top pt-4 mb-5">
+            <div class="d-flex gap-2 align-items-center">
+                <form method="POST" action="{% url 'news:toggle_like' article.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link p-0 text-decoration-none">
+                        {% if article|has_liked:user_ip %}
+                            <i class="bi bi-balloon-heart-fill text-danger fs-5"></i> {{ article.likes.count }}
+                        {% else %}
+                            <i class="bi bi-balloon-heart text-muted fs-5"></i> {{ article.likes.count }}
+                        {% endif %}
+                    </button>
+                </form>
+                <form method="POST" action="{% url 'news:toggle_favorite' article.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link p-0 text-decoration-none">
+                        {% if article|has_favorited:user_ip %}
+                            <i class="bi bi-star-fill text-warning fs-5"></i>
+                        {% else %}
+                            <i class="bi bi-star text-muted fs-5"></i>
+                        {% endif %}
+                    </button>
+                </form>
             </div>
         </div>
         <!-- Кнопки управления -->
