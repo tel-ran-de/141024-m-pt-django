@@ -1,8 +1,11 @@
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView
 
-from .forms import CustomAuthenticationForm
+from .forms import CustomAuthenticationForm, RegisterUserForm
 from news.views import BaseMixin
 
 
@@ -23,4 +26,18 @@ class LogoutUser(BaseMixin, LogoutView):
 
 
 def sign_up(request):
-    return HttpResponse('Регистрация')
+    if request.method == 'POST':
+        form = RegisterUserForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return redirect(reverse('users:register_done'))
+    else:
+        form = RegisterUserForm()
+    return render(request, 'users/register.html', {'form': form})
+
+
+class RegisterDoneView(LoginRequiredMixin, BaseMixin, TemplateView):
+    template_name = 'users/register_done.html'
+    extra_context = {'title': 'Регистрация завершена'}
