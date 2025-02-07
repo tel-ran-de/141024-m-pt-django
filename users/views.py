@@ -30,15 +30,6 @@ class RegisterUser(BaseMixin, CreateView):
     extra_context = {'title': 'Регистрация'}
     success_url = reverse_lazy('users:register_done')
 
-    def form_valid(self, form):
-        # Сохраняем пользователя, но не коммитим в базу данных
-        user = form.save(commit=False)
-        # Хешируем пароль
-        user.set_password(form.cleaned_data['password'])
-        # Сохраняем пользователя в базе данных
-        user.save()
-        return super().form_valid(form)
-
 
 class RegisterDoneView(LoginRequiredMixin, BaseMixin, TemplateView):
     template_name = 'users/register_done.html'
