@@ -29,7 +29,7 @@ class RegisterUserForm(UserCreationForm):
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
-        label='Имя пользователя',
+        label='Имя пользователя или почта',
         widget=forms.TextInput(attrs={'class': 'form-control'}),
     )
     password = forms.CharField(
