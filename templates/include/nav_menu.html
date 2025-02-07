@@ -14,7 +14,10 @@
           <a class="nav-link" href="#">Привет, {{ user.username }}!</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'users:logout' %}">Выйти</a>
+          <form method="post" action="{% url 'users:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link nav-link">Выйти</button>
+          </form>
         </li>
     {% else %}
         <li class="nav-item">
