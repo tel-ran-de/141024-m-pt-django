@@ -13,6 +13,7 @@ urlpatterns = [
     path('about/', views.AboutView.as_view(), name='about'),
     path('news/', include('news.urls', namespace='news')),
     path('users/', include('users.urls', namespace='users')),
+    path('accounts/', include('allauth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
