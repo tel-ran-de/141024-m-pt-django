@@ -5,39 +5,33 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 
 class CustomSignupForm(SignupForm):
-    first_name = forms.CharField(max_length=30, label='Имя')
-    last_name = forms.CharField(max_length=30, label='Фамилия')
+    first_name = forms.CharField(
+        max_length=30,
+        label='Имя',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваше имя'})
+    )
+    last_name = forms.CharField(
+        max_length=30,
+        label='Фамилия',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите вашу фамилию'})
+    )
+    email = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваш email'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(CustomSignupForm, self).__init__(*args, **kwargs)
+        self.fields['password1'].widget = forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Введите пароль'})
+        self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Подтвердите пароль'})
 
     def save(self, request):
         user = super(CustomSignupForm, self).save(request)
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
+        user.username = user.email  # Устанавливаем email в качестве username
         user.save()
         return user
-
-
-class RegisterUserForm(UserCreationForm):
-    password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-
-    class Meta:
-        model = get_user_model()
-        fields = ('username', 'email', 'first_name')
-        labels = {
-            'email': 'Почта',
-            'first_name': 'Имя',
-        }
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        if get_user_model().objects.filter(email=email).exists():
-            raise forms.ValidationError('Пользователь с такой почтой уже существует.')  # проверка на уникальность почты
-        return email
 
 
 class CustomAuthenticationForm(AuthenticationForm):
