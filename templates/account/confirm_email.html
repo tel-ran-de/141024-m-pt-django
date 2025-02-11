@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body">
+          {% if confirmation %}
+            <h3 class="card-title mb-4">Подтверждение email</h3>
+            <p>Для завершения регистрации подтвердите email:</p>
+            <p class="lead text-center">{{ confirmation.email_address.email }}</p>
+
+            <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary w-100">
+                Подтвердить
+              </button>
+            </form>
+          {% else %}
+            <div class="alert alert-danger">
+              <h4 class="alert-heading">Ошибка!</h4>
+              <p>Ссылка для подтверждения email недействительна или устарела.</p>
+              <hr>
+              <p class="mb-0">
+                Запросите новую ссылку в <a href="{% url 'account_email' %}">настройках аккаунта</a>.
+              </p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

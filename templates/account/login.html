@@ -1,16 +1,60 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="container">
-    <div class="row">
-        <div class="col-12 col-md-6 offset-md-3">
-            <h2>Вход в систему</h2>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-dark">Войти</button>
-            </form>
-            <a class="btn btn-link" href="{% url 'account_reset_password' %}">Забыли пароль?</a>
+  <div class="row">
+    <div class="col-12 col-md-6 offset-md-3">
+      <h2>Вход в систему</h2>
+      <form method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label for="id_login" class="form-label">Email</label>
+          <input type="email"
+                 name="login"
+                 class="form-control"
+                 id="id_login"
+                 placeholder="Ваш email"
+                 required>
         </div>
+
+        <div class="mb-3">
+          <label for="id_password" class="form-label">Пароль</label>
+          <input type="password"
+                 name="password"
+                 class="form-control"
+                 id="id_password"
+                 placeholder="Ваш пароль"
+                 required>
+        </div>
+
+        <div class="mb-3 form-check">
+          <input type="checkbox"
+                 name="remember"
+                 class="form-check-input"
+                 id="id_remember">
+          <label class="form-check-label" for="id_remember">
+            Запомнить меня
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Войти</button>
+
+        <div class="text-center mt-3">
+          <a href="{% url 'account_reset_password' %}" class="text-decoration-none">
+            Забыли пароль?
+          </a>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 {% endblock %}
