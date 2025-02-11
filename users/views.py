@@ -14,11 +14,6 @@ class LogoutUser(BaseMixin, LogoutView):
     next_page = reverse_lazy('account_login')
 
 
-class RegisterDoneView(LoginRequiredMixin, BaseMixin, TemplateView):
-    template_name = 'users/register_done.html'
-    extra_context = {'title': 'Регистрация завершена'}
-
-
 class CustomConfirmEmailView(ConfirmEmailView):
     def get(self, *args, **kwargs):
         response = super().get(*args, **kwargs)
