@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load socialaccount %}
 
 {% block content %}
 <div class="container">
@@ -54,6 +55,20 @@
           </a>
         </div>
       </form>
+
+      <!-- Блок для соц. входа -->
+      {% if socialaccount_providers %}
+        <div class="social-logins mt-3">
+          {% for provider in socialaccount_providers %}
+            <a href="{% provider_login_url provider.id %}" class="btn btn-secondary w-100 mb-2">
+              Войти через {{ provider.name }}
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>Нет доступных способов входа через соцсети.</p>
+      {% endif %}
+
     </div>
   </div>
 </div>
