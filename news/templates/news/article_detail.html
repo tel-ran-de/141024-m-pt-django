@@ -85,18 +85,18 @@
             </div>
         </div>
         <!-- Кнопки управления -->
-        <div class="article-actions border-top pt-4">
-            <div class="d-flex gap-2">
-                <a href="{% url 'news:article_update' article.id %}"
-                   class="btn btn-warning">
-                    <i class="bi bi-pencil-square"></i> Редактировать
-                </a>
-                <a href="{% url 'news:article_delete' article.id %}"
-                   class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Удалить
-                </a>
+        {% if article|can_edit:user %}
+            <div class="article-actions border-top pt-4">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'news:article_update' article.id %}" class="btn btn-warning">
+                        <i class="bi bi-pencil-square"></i> Редактировать
+                    </a>
+                    <a href="{% url 'news:article_delete' article.id %}" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Удалить
+                    </a>
+                </div>
             </div>
-        </div>
+        {% endif %}
     </article>
 </div>
 {% endblock %}

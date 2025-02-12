@@ -34,3 +34,20 @@ def basename(value):
 @register.filter
 def add(value, arg):
     return int(value) + int(arg)
+
+
+@register.filter(name='can_edit')
+def can_edit(article, user):
+    """
+    Возвращает True, если пользователь может редактировать (или удалять) статью.
+    Условие:
+      - пользователь аутентифицирован, и
+      - либо он является суперпользователем,
+      - либо состоит в группе "Moderator",
+      - либо является автором статьи.
+    """
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser or user.groups.filter(name="Moderator").exists():
+        return True
+    return article.author == user
