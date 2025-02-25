@@ -108,6 +108,9 @@ class Article(models.Model):
     objects = ArticleManager()
     all_objects = AllArticleManager()
 
+    def get_absolute_url(self):
+        return reverse('news:detail_article_by_id', kwargs={'pk': self.pk})
+
     def save(self, *args, **kwargs):
         # Сохраняем статью, чтобы получить id
         super().save(*args, **kwargs)
@@ -161,3 +164,17 @@ class ArticleHistoryDetail(models.Model):
 
     def __str__(self):
         return f"{self.field_name}: {self.old_value} → {self.new_value}"
+
+
+class Comment(models.Model):
+    article = models.ForeignKey('Article', on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True, related_name='comments')
+    content = models.TextField(verbose_name="Комментарий")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Комментарий от {self.user or 'Аноним'} на {self.article.title}"
+
+    class Meta:
+        ordering = ('created_at',)

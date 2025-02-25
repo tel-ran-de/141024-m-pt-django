@@ -97,6 +97,35 @@
                 </div>
             </div>
         {% endif %}
+
+        <!-- Секция комментариев -->
+        <div class="comments-section mt-5">
+          <h4>Комментарии</h4>
+          {% if comments %}
+            {% for comment in comments %}
+              <div class="card mb-2">
+                <div class="card-body">
+                  <p class="card-text">{{ comment.content }}</p>
+                  <small class="text-muted">
+                    {{ comment.user.username|default:"Аноним" }} – {{ comment.created_at|date:"d M Y H:i" }}
+                  </small>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p>Нет комментариев.</p>
+          {% endif %}
+
+          {% if user.is_authenticated %}
+            <form method="post" action="">
+              {% csrf_token %}
+              {{ comment_form.as_p }}
+              <button type="submit" class="btn btn-primary">Оставить комментарий</button>
+            </form>
+          {% else %}
+            <p>Пожалуйста, <a href="{% url 'account_login' %}">войдите</a>, чтобы оставить комментарий.</p>
+          {% endif %}
+        </div>
     </article>
 </div>
 {% endblock %}

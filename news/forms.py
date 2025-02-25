@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Article, Category, Tag
+from .models import Article, Category, Comment, Tag
 
 
 class ArticleForm(forms.ModelForm):
@@ -51,3 +51,14 @@ class ArticleUploadForm(forms.Form):
                     errors.append(f"В новости '{title}' несуществующий тег '{tag_name}'. Впишите один из этих тегов в файл: {', '.join(existing_tags)}")
 
         return errors
+
+
+class CommentForm(forms.ModelForm):
+    content = forms.CharField(
+        label="Ваш комментарий",
+        widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Введите текст комментария'})
+    )
+
+    class Meta:
+        model = Comment
+        fields = ['content']
