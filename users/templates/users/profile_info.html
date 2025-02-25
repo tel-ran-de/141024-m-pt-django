@@ -5,31 +5,12 @@
   <h3>Информация о пользователе</h3>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <div class="mb-3">
-      <label for="{{ user_form.username.id_for_label }}" class="form-label">Логин</label>
-      {{ user_form.username }}
-    </div>
-    <div class="mb-3">
-      <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Имя</label>
-      {{ user_form.first_name }}
-    </div>
-    <div class="mb-3">
-      <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Фамилия</label>
-      {{ user_form.last_name }}
-    </div>
-    <div class="mb-3">
-      <label for="{{ user_form.email.id_for_label }}" class="form-label">Email</label>
-      {{ user_form.email }}
-    </div>
-    <div class="mb-3">
-      <label for="{{ profile_form.avatar.id_for_label }}" class="form-label">Аватар</label>
-      {{ profile_form.avatar }}
-      {% if user.profile.avatar %}
-        <img src="{{ user.profile.avatar.url }}" alt="Avatar" width="150" class="mt-2">
-      {% else %}
-        <p>Аватар не установлен.</p>
-      {% endif %}
-    </div>
+    {% for field in user_form %}
+      {% include "include/form_field.html" with field=field %}
+    {% endfor %}
+    {% for field in profile_form %}
+      {% include "include/form_field.html" with field=field %}
+    {% endfor %}
     <button type="submit" class="btn btn-primary">Сохранить изменения</button>
   </form>
   <p class="mt-3">

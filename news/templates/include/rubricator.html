@@ -3,7 +3,8 @@
         <ul class="list-group list-group-flush">
             {% for category in categories %}
                 {% if category.article_set.count > 0 %}
-                    <a href="{% url 'news:get_news_by_category' category.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-transparent text-light hover-effect">
+                    <a href="{% url 'news:get_news_by_category' category.id %}"
+                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-transparent text-light hover-effect {% if active_category_id|stringformat:"s" == category.id|stringformat:"s" %}active-category{% endif %}">
                         {{ category.name }}
                         <span class="badge bg-primary rounded-pill">{{ category.article_set.count }}</span>
                     </a>

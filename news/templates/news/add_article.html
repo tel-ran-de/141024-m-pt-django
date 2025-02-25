@@ -1,81 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Добавить новую статью</h1>
-        <a href="{% url 'news:upload_json' %}" class="btn btn-success">
-            <i class="bi bi-upload"></i> Загрузить новости из JSON
-        </a>
-    </div>
+    <h1 class="mb-4">Добавить новую статью</h1>
 
     {% if errors %}
-        <div class="alert alert-danger">
-            <ul>
-                {% for error in errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+      <div class="alert alert-danger">
+        <ul>
+          {% for error in errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
     {% endif %}
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-
-        <!-- Поле для изображения -->
-        <div class="mb-3">
-            <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">Обложка статьи:</label>
-            {{ form.image }}
-            <small class="form-text text-muted">
-                Максимальный размер файла: 5 МБ
-            </small>
-        </div>
-
-        <!-- Основные поля формы -->
-        <div class="mb-3">
-            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">Заголовок:</label>
-            {{ form.title }}
-            {% if form.title.errors %}
-                <div class="alert alert-danger mt-2">
-                    {{ form.title.errors }}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="mb-3">
-            <label for="{{ form.content.id_for_label }}" class="form-label fw-bold">Текст статьи:</label>
-            {{ form.content }}
-            {% if form.content.errors %}
-                <div class="alert alert-danger mt-2">
-                    {{ form.content.errors }}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="mb-3">
-            <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">Категория:</label>
-            {{ form.category }}
-        </div>
-
-        <div class="mb-3">
-            <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">Теги:</label>
-            <div class="row">
-                <div class="col-md-6">
-                    {% for tag in form.tags %}
-                        {% if forloop.counter0|divisibleby:2 %}
-                            {{ tag }}<br>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <div class="col-md-6">
-                    {% for tag in form.tags %}
-                        {% if not forloop.counter0|divisibleby:2 %}
-                            {{ tag }}<br>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
+        {% for field in form %}
+          {% include "include/form_field.html" with field=field %}
+        {% endfor %}
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <button type="submit" class="btn btn-primary btn-lg">
                 <i class="bi bi-save"></i> Опубликовать

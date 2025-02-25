@@ -5,41 +5,12 @@
     <h1 class="mb-4">Редактировать статью {{ index|add:1 }} из {{ total }}</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <!-- Поле для изображения -->
-        <div class="mb-3">
-            <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">Обложка статьи:</label>
-            {{ form.image }}
-            <small class="form-text text-muted">
-                Максимальный размер файла: 5 МБ
-            </small>
-        </div>
-        <!-- Основные поля формы -->
-        <div class="mb-3">
-            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">Заголовок:</label>
-            {{ form.title }}
-            {% if form.title.errors %}
-                <div class="alert alert-danger mt-2">
-                    {{ form.title.errors }}
-                </div>
-            {% endif %}
-        </div>
-        <div class="mb-3">
-            <label for="{{ form.content.id_for_label }}" class="form-label fw-bold">Текст статьи:</label>
-            {{ form.content }}
-            {% if form.content.errors %}
-                <div class="alert alert-danger mt-2">
-                    {{ form.content.errors }}
-                </div>
-            {% endif %}
-        </div>
-        <div class="mb-3">
-            <label for="{{ form.category.id_for_label }}" class="form-label fw-bold">Категория:</label>
-            {{ form.category }}
-        </div>
-        <div class="mb-3">
-            <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">Теги:</label>
-            {{ form.tags }}
-        </div>
+        {% include "include/form_field.html" with field=form.image %}
+        <small class="form-text text-muted mb-3">Максимальный размер файла: 5 МБ</small>
+        {% include "include/form_field.html" with field=form.title %}
+        {% include "include/form_field.html" with field=form.content %}
+        {% include "include/form_field.html" with field=form.category %}
+        {% include "include/form_field.html" with field=form.tags %}
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             {% if not is_last %}
                 <button type="submit" name="next" class="btn btn-primary btn-lg">
