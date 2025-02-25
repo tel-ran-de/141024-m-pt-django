@@ -2,7 +2,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views.generic import TemplateView, ListView
-from news.models import Article
+from news.models import Article, ArticleHistory
 
 from .forms import UserUpdateForm, ProfileUpdateForm
 

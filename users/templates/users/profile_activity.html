@@ -3,6 +3,22 @@
 
 {% block profile_content %}
   <h3>История действий</h3>
-  <p>Здесь будет отображаться история действий пользователя.</p>
-  {# Реализуйте вывод истории, например, используя модель логов или стороннюю библиотеку #}
+  {% if histories %}
+    {% for history in histories %}
+      <div class="card mb-3">
+        <div class="card-header">
+          <strong>{{ history.article.title }}</strong> — {{ history.timestamp|date:"d M Y H:i" }}
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for detail in history.details.all %}
+            <li class="list-group-item">
+              {{ detail.field_name }}: <em>{{ detail.old_value }}</em> → <em>{{ detail.new_value }}</em>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>История действий отсутствует.</p>
+  {% endif %}
 {% endblock %}
