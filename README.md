@@ -4731,3 +4731,29 @@ python manage.py migrate
    - Вместо `form.save(commit=False)` теперь сразу назначается `form.instance.author = self.request.user`.
 
 **commit: `Урок 30: добавили распределение прав доступа`**
+
+
+## Урок 31
+
+1. **Добавлена модель профиля `Profile`**
+   - `Profile` содержит `nickname` и `avatar`.
+   - Связан `OneToOneField` с `User`, создается автоматически при регистрации (сигнал `post_save`).
+
+2. **Добавлены страницы профиля**
+   - `profile_info.html`: основная информация, смена пароля, аватар.
+   - `profile_articles.html`: список статей пользователя.
+   - `profile_activity.html`: история активности (будет расширяться).
+   - `profile_base.html`: базовый шаблон с табами.
+
+3. **Добавлены представления для профиля**
+   - `ProfileInfoView`, `ProfileArticlesView`, `ProfileActivityView`.
+   - `ProfileArticlesView` использует `ListView` и поддерживает пагинацию.
+
+4. **Обновлена навигация**
+   - В `nav_menu.html` добавлена ссылка на профиль пользователя.
+
+5. **Обновлены маршруты `users/`**
+   - Теперь `/users/profile/` доступен через `ProfileInfoView`.
+   - `/users/profile/articles/` и `/users/profile/activity/` также доступны.
+
+**commit: `Урок 31: добавили профиль пользователя: страницы, модель и сигналы`**

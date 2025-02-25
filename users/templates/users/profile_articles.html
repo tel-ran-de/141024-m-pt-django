@@ -1,0 +1,19 @@
+{# users/templates/users/profile_articles.html #}
+{% extends "users/profile_base.html" %}
+
+{% block profile_content %}
+  <h3>Мои статьи</h3>
+  {% if articles %}
+    <ul class="list-group">
+      {% for article in articles %}
+        <li class="list-group-item">
+          <a href="{% url 'news:detail_article_by_id' article.id %}">{{ article.title }}</a>
+          <small class="text-muted">({{ article.publication_date|date:"d M Y" }})</small>
+        </li>
+      {% endfor %}
+    </ul>
+    {% include "include/paginator.html" with page=page_obj %}
+  {% else %}
+    <p>У вас пока нет опубликованных статей.</p>
+  {% endif %}
+{% endblock %}

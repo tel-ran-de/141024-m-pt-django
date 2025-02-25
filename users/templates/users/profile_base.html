@@ -1,0 +1,22 @@
+{# users/templates/users/profile_base.html #}
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Профиль пользователя</h2>
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link {% if active_tab == 'info' %}active{% endif %}" href="{% url 'users:profile' %}">Информация</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active_tab == 'articles' %}active{% endif %}" href="{% url 'users:profile_articles' %}">Статьи</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active_tab == 'activity' %}active{% endif %}" href="{% url 'users:profile_activity' %}">История действий</a>
+    </li>
+  </ul>
+  <div class="tab-content mt-3">
+    {% block profile_content %}
+    {% endblock %}
+  </div>
+</div>
+{% endblock %}
